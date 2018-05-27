@@ -47,7 +47,7 @@ $ cd ipyauth/ipyauth_callback/templates
 $ npm install
 
 # build notebook extension javascript
-$ cd ipyauth/js
+$ cd ../../js
 $ npm install
 
 # test run to see what you will publish
