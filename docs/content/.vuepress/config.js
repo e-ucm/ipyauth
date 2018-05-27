@@ -23,7 +23,7 @@ module.exports = {
 			},
 			{
 				text: 'Development',
-				link: '/dev/install'
+				link: '/dev/dev_install'
 			},
 		],
 		sidebarDepth: 5,
