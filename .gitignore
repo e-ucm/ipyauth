@@ -11,16 +11,18 @@ dist/*
 *.egg-info/
 
 **/node_modules/
+**/dist/
+**/build/
+**/static/
 
-ipyauth/ipyauth_callback/templates/dist/*
-ipyauth/ipyauth_widget/static/*
-notebooks/*test.ipynb
-docs/content/.vuepress/dist
 ipyauth-ext-folders-jupyterlab.code-workspace
 ipyauth-ext-folders-notebook.code-workspace
-video/
+
 ./public/
+
+video/
 
 TODO.md
 **/temp-*
 **-orig.*
+notebooks/*test.ipynb
