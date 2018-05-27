@@ -14,14 +14,12 @@ dist/*
 
 ipyauth/ipyauth_callback/templates/dist/*
 ipyauth/ipyauth_widget/static/*
-ipyauth/js/dist/*
 notebooks/*test.ipynb
 docs/content/.vuepress/dist
 ipyauth-ext-folders-jupyterlab.code-workspace
 ipyauth-ext-folders-notebook.code-workspace
 video/
-public/
-
+./public/
 
 TODO.md
 **/temp-*
