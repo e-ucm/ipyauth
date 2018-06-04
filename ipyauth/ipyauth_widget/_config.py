@@ -7,11 +7,11 @@ def _build_dics():
     """
     dic_filename = {
         'Auth0':
-        {'logo': 'Auth0-logo.png',
+        {'logo': 'auth0-logo.png',
          'signout_text': 'Clear',
          },
         'Google':
-        {'logo': 'Google-logo.png',
+        {'logo': 'google-logo.png',
          'signout_text': 'Sign Out'
          }}
     dic_logo = {k: os.path.join(os.path.dirname(__file__), 'img', v['logo'])
