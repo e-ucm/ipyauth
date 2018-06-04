@@ -44,7 +44,7 @@ After authentication the fields contain the:
 
 For example:
 
-![](/licecap-ipyauth-auth0-2.gif)
+![](/img/licecap-ipyauth-auth0-2.gif)
 
 And the `Auth` object contains the same info. This command:
 
