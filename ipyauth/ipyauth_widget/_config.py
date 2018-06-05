@@ -12,7 +12,7 @@ def _build_dics():
          },
         'Google':
         {'logo': 'google-logo.png',
-         'signout_text': 'Sign Out'
+         'signout_text': 'Clear'
          }}
     dic_logo = {k: os.path.join(os.path.dirname(__file__), 'img', v['logo'])
                 for k, v in dic_filename.items()}

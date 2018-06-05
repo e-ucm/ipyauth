@@ -14,9 +14,9 @@ from traitlets import observe, Unicode, Dict, Int, Bool
 
 from ..__meta__ import __version_js__
 from ._config import DIC_LOGO, DIC_SIGNOUT_TEXT
-from ._params import Params
 
-semver_range_frontend = '~' + __version_js__
+
+_semver_range_frontend_ = '~' + __version_js__
 
 
 class Auth(wg.VBox):
@@ -27,16 +27,15 @@ class Auth(wg.VBox):
     _view_name = Unicode('AuthView').tag(sync=True)
     _model_module = Unicode('ipyauth').tag(sync=True)
     _view_module = Unicode('ipyauth').tag(sync=True)
-    _model_module_version = Unicode(semver_range_frontend).tag(sync=True)
-    _view_module_version = Unicode(semver_range_frontend).tag(sync=True)
+    _model_module_version = Unicode(_semver_range_frontend_).tag(sync=True)
+    _view_module_version = Unicode(_semver_range_frontend_).tag(sync=True)
 
-    _type = Unicode('').tag(sync=True)
+    name = Unicode('').tag(sync=True)
     _id = Unicode('').tag(sync=True)
     _signout_text = Unicode('').tag(sync=True)
 
     params = Dict({}).tag(sync=True)
 
-    # logged = Bool(False).tag(sync=True)
     access_token = Unicode('').tag(sync=True)
     scope = Unicode('').tag(sync=True)
     logged_as = Unicode('').tag(sync=True)
@@ -46,20 +45,20 @@ class Auth(wg.VBox):
     _click_signout = Int(0).tag(sync=True)
 
     def __init__(self,
-                 params=None,
-                 verbose=False):
+                 params=None):
         """
         """
-        msg = 'params must be a Params object'
-        assert isinstance(params, Params), msg
+        cname = str(params)
+        msg = 'params must be a Params[IdProvider] object'
+        assert 'ipyauth.ipyauth_widget._params_' in cname and '.Params' in cname
 
-        dic = {}
+        # dic = {}
         uuid = ''.join([rd.choice(string.ascii_lowercase) for n in range(6)])
 
-        self.params = params.to_dict()
-        self._type = self.params['_type']
-        self._id = self._type + '-' + uuid
-        self._signout_text = DIC_SIGNOUT_TEXT[self._type]
+        self.params = params.data
+        self.name = self.params['name']
+        self._id = self.name + '-' + uuid
+        self._signout_text = DIC_SIGNOUT_TEXT[self.name]
 
         wg_logo = self.build_widget_logo()
         wg_button_main = self.build_widget_button_main()
@@ -81,14 +80,13 @@ class Auth(wg.VBox):
 
         super().__init__([b1, b2])
 
-        if 'callback_info' in self.params:
-            self.create_callback_creds_file(self.params['callback_info'])
-
+        # if 'callback_info' in self.params:
+        #     self.create_callback_creds_file(self.params['callback_info'])
 
     def build_widget_logo(self):
         """
         """
-        path_img = DIC_LOGO[self._type]
+        path_img = DIC_LOGO[self.name]
         with open(path_img, 'rb') as f:
             image = f.read()
 
@@ -179,7 +177,7 @@ class Auth(wg.VBox):
     def show(self):
         """
         """
-        for attr in ['_type',
+        for attr in ['name',
                      '_id',
                      'params',
                      'logged_as',
@@ -195,47 +193,45 @@ class Auth(wg.VBox):
         """
         self._click_signout += 1
 
+    # def create_callback_creds_file(self, dic_attr):
+    #     """
+    #     method called to create file creds-IdProvider.js
+    #     under ipyauth_callback/templates/dist/assets
+    #     to allow callbackk page access to credentials
+    #     listed in li_attr
+    #     """
+    #     id_provider = dic_attr['id_provider']
+    #     li_param = dic_attr['params']
 
-    def create_callback_creds_file(self, dic_attr):
-        """
-        method called to create file creds-IdProvider.js
-        under ipyauth_callback/templates/dist/assets
-        to allow callbackk page access to credentials
-        listed in li_attr
-        """
-        id_provider = dic_attr['id_provider']
-        li_param = dic_attr['params']
+    #     path_site_packages = site.getsitepackages()[0]
+    #     path_package = os.path.join(path_site_packages, 'ipyauth')
+    #     path_package_link = os.path.join(path_site_packages, 'ipyauth.egg-link')
 
+    #     if os.path.exists(path_package):
+    #         # installed package
+    #         path_file_creds = os.path.join(path_package,
+    #                                        'ipyauth_callback',
+    #                                        'templates',
+    #                                        'dist',
+    #                                        'assets',
+    #                                        'creds-{}.js'.format(id_provider))
+    #     elif os.path.exists(path_package_link):
+    #         # dev install i.e. linked
+    #         with open(path_package_link, 'r') as f:
+    #             content = f.read()
+    #         path_package_read = content.split('\n')[0].strip()
+    #         path_file_creds = os.path.join(path_package_read,
+    #                                        'ipyauth',
+    #                                        'ipyauth_callback',
+    #                                        'templates',
+    #                                        'dist',
+    #                                        'assets',
+    #                                        'creds-{}.js'.format(id_provider))
+    #     else:
+    #         raise Exception('Cannot find package path')
 
-        path_site_packages = site.getsitepackages()[0]
-        path_package = os.path.join(path_site_packages, 'ipyauth')
-        path_package_link = os.path.join(path_site_packages, 'ipyauth.egg-link')
-
-        if os.path.exists(path_package):
-            # installed package
-            path_file_creds = os.path.join(path_package,
-                                           'ipyauth_callback',
-                                           'templates',
-                                           'dist',
-                                           'assets',
-                                           'creds-{}.js'.format(id_provider))
-        elif os.path.exists(path_package_link):
-            # dev install i.e. linked
-            with open(path_package_link, 'r') as f:
-                content = f.read()
-            path_package_read = content.split('\n')[0].strip()
-            path_file_creds = os.path.join(path_package_read,
-                                           'ipyauth',
-                                           'ipyauth_callback',
-                                           'templates',
-                                           'dist',
-                                           'assets',
-                                           'creds-{}.js'.format(id_provider))
-        else:
-            raise Exception('Cannot find package path')
-
-        with open(path_file_creds, 'w') as f:
-            lines = ["const {}_{}='{}';".format(id_provider, p, self.params[p])
-                     for p in li_param]
-            content = '\n'.join(lines)
-            f.write(content)
+    #     with open(path_file_creds, 'w') as f:
+    #         lines = ["const {}_{}='{}';".format(id_provider, p, self.params[p])
+    #                  for p in li_param]
+    #         content = '\n'.join(lines)
+    #         f.write(content)
