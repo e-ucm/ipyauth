@@ -4,11 +4,7 @@ import * as widgets from '@jupyter-widgets/controls';
 import auth from './widget_auth';
 import { version } from '../package.json';
 
-// import callback from './widget_callback';
-
 const semver_range = `~${version}`;
-
-// let temp;
 
 const AuthModel = widgets.VBoxModel.extend({
     defaults() {
@@ -22,11 +18,9 @@ const AuthModel = widgets.VBoxModel.extend({
 
             name: '',
             _id: '',
-            _signout_text: '',
 
             params: {},
 
-            logged: '',
             access_token: '',
             scope: '',
             logged_as: '',
@@ -99,7 +93,6 @@ const AuthView = widgets.VBoxView.extend({
                 resolved.btn_inspect.el.addEventListener('click', btn_inspect_clicked);
 
                 that.form = resolved;
-                // auth.updateDisplay(that);
 
                 // iframe
                 const ifrm = document.createElement('iframe');
@@ -109,13 +102,6 @@ const AuthView = widgets.VBoxView.extend({
                 ifrm.src = '';
                 ifrm.style.display = 'none';
                 that.el.appendChild(ifrm);
-
-                // debug
-                console.log('resolved');
-                console.log(resolved);
-                window.resolved = resolved;
-                window.that = that;
-                window.auth = auth;
 
                 console.log('views2 callback end');
             });

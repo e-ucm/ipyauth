@@ -5,7 +5,12 @@ const ipyauthHistory = [];
 
 const startAuthFlowInIframe = (authUrl, readMessage) => {
     window.addEventListener('message', readMessage);
-    document.getElementById('auth').src = authUrl;
+    try {
+        document.getElementById('auth').src = authUrl;
+    } catch (e) {
+        window.removeEventListener('message', readMessage);
+        debug('Error in startAuthFlowInIframe', e);
+    }
 };
 
 const startAuthFlowInPopup = (authUrl, name, readMessage, windowProps = null) => {
@@ -36,22 +41,28 @@ function startAuthFlow(that, mode, prompt) {
 
     console.log(`name=${IdProviderName}, isIframeMode=${isIframeMode}`);
 
+    util.debug('paramsModel', paramsModel);
+
     // build params
-    window.provider = provider;
-    window.IdProviderName = IdProviderName;
 
-    const paramsFull = Object.assign({}, provider[IdProviderName], paramsModel);
-    util.debug('paramsFull', paramsFull);
+    const paramsTemplate = provider[IdProviderName];
 
-    const params = util.buildParams(paramsFull, IdProviderName, isIframeMode, prompt);
-    util.debug('params', params);
+    const paramsFull = Object.assign({}, paramsTemplate, paramsModel);
+    util.debug('paramsFull0', paramsFull);
+
+    const url_params = Object.assign({}, paramsTemplate.url_params, paramsModel.url_params);
+    paramsFull.url_params = url_params;
+    util.debug('paramsFull1', paramsFull);
+
+    paramsFull.url_params = util.buildUrlParams(paramsFull, isIframeMode, prompt);
+    util.debug('paramsFull2', paramsFull);
 
     // build authorize url
-    const authUrl = util.buildAuthorizeUrl(params);
+    const authUrl = util.buildAuthorizeUrl(paramsFull);
     util.debug('authUrl', authUrl);
 
     // build readmessage function
-    that.params = params;
+    that.params = paramsFull;
     const readMessage = buidReadMessage(that);
     // util.debug('readMessage', readMessage);
 
@@ -93,33 +104,10 @@ const buidReadMessage = that => {
                 if (isValid) {
                     that.creds = creds;
                     const objCreds = util.buildObjCreds(params, creds);
-
                     updateDisplay(that, objCreds);
-
-                    // display('You are authenticated.', 'authStatus', true);
-                    // display(`Timestamp: ${new Date().toJSON()}`, 'authStatus');
-                    // display(JSON.stringify(objCreds), 'authStatus');
-
-                    // debug
-                    // window.creds = creds;
-                    // window.params = params;
-                    // window.objCreds = objCreds;
-
-                    // util.debug('objCreds.isExpired()', objCreds.isExpired());
-                    // util.debug('objCreds.getSecondsToExp()', objCreds.getSecondsToExp());
-                    // util.debug(
-                    //     'objCreds.getSecondsToExp(HMS=true)',
-                    //     objCreds.getSecondsToExp(true)
-                    // );
-                    // util.debug('objCreds.getUsername()', objCreds.getUsername());
-                    // util.debug('objCreds.getExpiry()', objCreds.getExpiry());
                 } else {
                     console.log('Error in authentication');
-                    alert('Error in authentication');
-
-                    // display('Error in authentication', 'authStatus', true);
-                    // display(`Timestamp: ${new Date().toJSON()}`, 'authStatus');
-                    // display(JSON.stringify(data), 'authStatus');
+                    alert('ipyauth Error: Invalid Callback - Open console for more info');
                 }
             });
         }
@@ -127,16 +115,18 @@ const buidReadMessage = that => {
         if (data.statusAuth === 'error') {
             // error in callback page
             console.log('in error');
-            const lastLog = getLastLog(ipyauthHistory, IdProviderName);
+            const IdProviderName = util.getIdProviderFromState(data.state);
+            const lastLog = util.getLastLog(ipyauthHistory, IdProviderName);
             util.debug('lastLog', lastLog);
             if (lastLog) {
-                const lastLogWasIframe = lastLog.mode === 'iframe' && lastLog.prompt === 'none';
-                util.debug('lastLogWasIframe', lastLogWasIframe);
+                const lastLogWasIframe = lastLog.mode === 'iframe';
+                // util.debug('lastLogWasIframe', lastLogWasIframe);
                 if (lastLogWasIframe) {
-                    console.log('Start new auth flow from stage1');
-                    newAuthFlow = [lastLog.name, 'popup', 'consent'];
-                    startAuthFlow(...newAuthFlow);
-                    return;
+                    console.log('Start new auth flow in popup');
+                    startAuthFlow(that, 'popup', 'consent');
+                } else {
+                    console.log('Error in authentication');
+                    alert('ipyauth Error: Authentication Failed - Open console for more info');
                 }
             }
         }
@@ -148,7 +138,7 @@ const buidReadMessage = that => {
 const login = that => startAuthFlow(that, 'iframe', 'none');
 
 const updateDisplay = (that, objCreds) => {
-    // window.creds = objCreds;
+    window.creds = objCreds;
     console.log('start updateDisplay');
 
     that.model.set({

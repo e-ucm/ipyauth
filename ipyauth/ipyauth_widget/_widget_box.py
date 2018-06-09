@@ -13,7 +13,7 @@ from IPython.display import display
 from traitlets import HasTraits, observe, Unicode, Dict, Int, Bool
 
 from ..__meta__ import __version_js__
-from ._config import DIC_LOGO, DIC_SIGNOUT_TEXT
+from ._config import DIC_LOGO
 
 
 _semver_range_frontend_ = '~' + __version_js__
@@ -32,7 +32,6 @@ class Auth(wg.VBox):
 
     name = Unicode('').tag(sync=True)
     _id = Unicode('').tag(sync=True)
-    _signout_text = Unicode('').tag(sync=True)
 
     params = Dict({}).tag(sync=True)
 
@@ -60,7 +59,6 @@ class Auth(wg.VBox):
         self.params = params.data
         self.name = self.params['name']
         self._id = self.name + '-' + uuid
-        self._signout_text = DIC_SIGNOUT_TEXT[self.name]
 
         wg_logo = self.build_widget_logo()
         wg_button_main = self.build_widget_button_main()

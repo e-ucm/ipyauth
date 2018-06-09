@@ -2,23 +2,25 @@ import axios from 'axios';
 
 import util from './widget_util';
 
-const SGConnect = {
+const sgconnect = {
     name: 'sgconnect',
-    response_type: '', // token or code
     authorize_endpoint: 'https://sso.sgmarkets.com/sgconnect/oauth2/authorize',
-    redirect_uri: 'my-redirect-url',
-    client_id: 'my-client-id',
-    client_secret: 'my-client-secret',
-    scope: 'my-scopes',
-    nonce: 'my-nonce',
-    state: 'my-state',
-    acr_values: 'L1',
+    url_params: {
+        response_type: '',
+        redirect_uri: 'my-redirect-url',
+        client_id: 'my-client-id',
+        scope: 'my-scopes',
+        nonce: 'my-nonce',
+        state: 'my-state',
+        acr_values: 'L1',
+    },
     scope_separator: ' ',
     isJWT: false,
     isValid: (params, creds) => {
+        const { url_params } = params;
         return new Promise((resolve, reject) => {
             // same nonce
-            const b = params.nonce === creds.id_token.nonce;
+            const b = url_params.nonce === creds.id_token.nonce;
             resolve([b, creds]);
             // set expiry
             const now = new Date();
@@ -30,26 +32,28 @@ const SGConnect = {
     },
 };
 
-const Auth0 = {
+const auth0 = {
     name: 'auth0',
-    response_type: '', // id_token token
     authorize_endpoint: 'https://my-domain.[zone].auth0.com/authorize',
-    redirect_uri: 'my-redirect-uri',
-    client_id: 'my-client-id',
-    client_secret: 'my-client-secret',
-    audience: 'my-audience',
-    scope: 'my-scopes',
-    nonce: 'mynonce',
-    state: 'mystate',
+    url_params: {
+        response_type: '',
+        redirect_uri: 'my-redirect-uri',
+        client_id: 'my-client-id',
+        audience: 'my-audience',
+        scope: 'my-scopes',
+        nonce: 'mynonce',
+        state: 'mystate',
+    },
     scope_separator: ' ',
     isJWT: true,
     isValid: (params, creds) => {
+        const { url_params } = params;
         return new Promise((resolve, reject) => {
             // same nonce
-            const b = params.nonce === creds.id_token.nonce;
+            const b = url_params.nonce === creds.id_token.nonce;
             // scope is not returned if all requested granted
             if (!creds.scope) {
-                creds.scope = params.scope;
+                creds.scope = url_params.scope;
             }
             // set expiry
             const now = new Date();
@@ -62,20 +66,22 @@ const Auth0 = {
 };
 
 // https://developers.google.com/identity/protocols/OAuth2WebServer#formingtheurl
-const Google = {
+const google = {
     name: 'google',
-    response_type: '', // token code
     authorize_endpoint: ' https://accounts.google.com/o/oauth2/v2/auth',
-    redirect_uri: 'httpmy-redirect-uri',
-    client_id: 'my-client-id',
-    client_secret: 'my-client-secret',
-    scope: 'my-scope',
+    url_params: {
+        response_type: '',
+        redirect_uri: 'my-redirect-uri',
+        client_id: 'my-client-id',
+        scope: 'my-scope',
+        access_type: 'online',
+        state: 'my-state',
+        include_granted_scopes: 'false',
+    },
     scope_separator: ' ',
-    access_type: 'online',
-    state: 'my-state',
-    include_granted_scopes: 'false',
     isJWT: false,
     isValid: (params, creds) => {
+        const { url_params } = params;
         return new Promise((resolve, reject) => {
             function useEmpty(error) {
                 console.log('Response tokeninfo or userinfo: ERROR');
@@ -127,7 +133,9 @@ const Google = {
                         }
 
                         // check aud = client_id
-                        const b = params.client_id === creds.tokeninfo.aud;
+                        const b = url_params.client_id === creds.tokeninfo.aud;
+                        // collect scope from tokeninfo
+                        creds.scope = creds.tokeninfo.scope;
                         // set expiry
                         const now = new Date();
                         creds.expiry = new Date(now.getTime() + creds.expires_in * 1000);
@@ -138,14 +146,10 @@ const Google = {
                 );
         });
     },
-    extractExpiry: creds => {
-        return new Date(creds.tokeninfo.exp * 1000);
-    },
-    extractUsername: creds => creds.userinfo.name,
 };
 
 export default {
-    SGConnect,
-    Auth0,
-    Google,
+    sgconnect,
+    auth0,
+    google,
 };

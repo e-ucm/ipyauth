@@ -31,7 +31,7 @@ class Util:
             return
 
         msg = 'prefix must be a string in {}'.format(VALID_ID_PROVIDERS)
-        assert isinstance(prefix, str), msg
+        assert prefix in VALID_ID_PROVIDERS, msg
 
         val = 'ipyauth-' + prefix + '-'
         msg = 'dotenv_file must start with ' + val

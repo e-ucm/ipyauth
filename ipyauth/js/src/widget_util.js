@@ -1,16 +1,7 @@
 const debug = (name, variable) => {
     console.log(name);
-    console.log(variable);
+    console.log(JSON.stringify(variable));
 };
-
-// const display = (obj, id = 'authStatus', reset = false) => {
-//     const e = document.getElementById(id);
-//     if (reset) {
-//         e.innerHTML = `${obj}<br/><br/>`;
-//     } else {
-//         e.innerHTML += `${obj}<br/><br/>`;
-//     }
-// };
 
 const isLogged = that => {
     const logged_as = that.model.get('logged_as');
@@ -70,15 +61,11 @@ const isPopup = state => {
     return data.includes('popup');
 };
 
-// const isIframe = state => {
-//     const data = state.split(',');
-//     return data.includes('iframe');
-// };
-
 const buildObjCreds = (params, creds) => {
     const obj = Object.assign({}, creds);
 
     obj.name = params.name;
+    obj.scope_separator = params.scope_separator;
 
     obj.getSecondsToExp = function(HMS = false) {
         try {
@@ -95,56 +82,46 @@ const buildObjCreds = (params, creds) => {
         const secondsToExp = this.getSecondsToExp();
         return secondsToExp <= 0;
     };
-
-    obj.getExpiry = function() {
-        return this.expiry;
-    };
-
-    obj.getUsername = function() {
-        return this.username;
-    };
-
     return obj;
 };
 
 const buildWindowProps = objProps => {
-    strProps = Object.entries(objProps)
+    const strProps = Object.entries(objProps)
         .map(e => `${e[0]} = ${e[1]}`)
         .join(',');
     return strProps;
 };
 
-const buildAuthorizeUrl = params => {
-    const params2 = Object.assign({}, params);
-    delete params2.authorize_endpoint;
-    delete params2.isValid;
-    delete params2.name;
+const buildUrlParams = (paramsFull, isIframeMode, prompt, randomNonce = true) => {
+    const url_params = Object.assign({}, paramsFull.url_params);
 
-    const paramsEncoded = serialize(params2);
-    const authUrl = `${params.authorize_endpoint}?${paramsEncoded}`;
+    if (randomNonce && url_params.nonce) {
+        url_params.nonce = createNonce();
+    }
+
+    url_params.state = [paramsFull.name, isIframeMode ? 'iframe' : 'popup'].join(',');
+
+    if (prompt) {
+        url_params.prompt = prompt;
+    }
+    if (isIframeMode) {
+        url_params.prompt = 'none';
+    }
+
+    return url_params;
+};
+
+const buildAuthorizeUrl = paramsFull => {
+    const url_params = Object.assign({}, paramsFull.url_params);
+
+    const paramsEncoded = serialize(url_params);
+    const authUrl = `${paramsFull.authorize_endpoint}?${paramsEncoded}`;
     return authUrl;
 };
 
-const buildParams = (IdProviderParams, isIframeMode, prompt, randomNonce = true) => {
-    // const IdP = IdProviderData[IdProviderName];
-    const params = Object.assign({}, IdProviderParams);
-
-    if (randomNonce && params.nonce) {
-        params.nonce = createNonce();
-    }
-
-    params.state = [params.name, isIframeMode ? 'iframe' : 'popup'];
-
-    debug('prompt', prompt);
-    if (prompt) {
-        params.prompt = prompt;
-        debug('params', params);
-    }
-    if (isIframeMode) {
-        params.prompt = 'none';
-    }
-
-    return params;
+const getIdProviderFromState = state => {
+    if (!state) return null;
+    return state.split(',')[0];
 };
 
 const logAuthFlow = (history, IdProviderName, mode, prompt) => {
@@ -239,9 +216,10 @@ export default {
 
     buildWindowProps,
     buildAuthorizeUrl,
-    buildParams,
+    buildUrlParams,
     buildObjCreds,
 
+    getIdProviderFromState,
     logAuthFlow,
     getLastLog,
 

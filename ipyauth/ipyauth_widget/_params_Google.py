@@ -27,10 +27,9 @@ class ParamsGoogle(HasTraits):
     scope_separator = Unicode(' ')
 
     def __init__(self,
-                 name='Google',
+                 name='google',
                  response_type=None,
                  client_id=None,
-                 client_secret=None,
                  redirect_uri=None,
                  scope=None,
 
@@ -49,15 +48,13 @@ class ParamsGoogle(HasTraits):
         self.name = name
 
         # overrides
-        if response_type:
+        if 'response_type' not in dic:
             self.response_type = response_type
-        if client_id:
+        if 'client_id' not in dic:
             self.client_id = client_id
-        if client_secret:
-            self.client_secret = client_secret
-        if redirect_uri:
+        if 'redirect_uri' not in dic:
             self.redirect_uri = redirect_uri
-        if scope:
+        if 'scope' not in dic:
             self.scope = scope
 
         self.data = self.build_data()
@@ -78,7 +75,6 @@ class ParamsGoogle(HasTraits):
     def _valid_response_type(self, proposal):
         """
         """
-        print(proposal['value'])
         if not proposal['value'] in ['token', 'code']:
             raise TraitError('response_type must be "token" or "code"')
         return proposal['value']
@@ -91,22 +87,44 @@ class ParamsGoogle(HasTraits):
             raise TraitError('redirect_uri must be an https url')
         return proposal['value']
 
+    @validate('scope')
+    def _valid_scope(self, proposal):
+        """
+        """
+        elmts = proposal['value'].split(' ')
+        if not ('profile' in elmts) and not ('openid' in elmts):
+            raise TraitError('scope must contain "profile" and "openid"')
+        return proposal['value']
+
+
     def build_data(self):
         """
         """
+        props_params = ['name',
+                        'authorize_endpoint',
+                        'tokeninfo_endpoint',
+                        'token_endpoint',
+                        ]
+        props_url_params = ['response_type',
+                            'client_id',
+                            'client_secret',
+                            'redirect_uri',
+                            'scope',
+                            'state',
+                            ]
+
         data = {}
-        for k in ['name',
-                  'response_type',
-                  'authorize_endpoint',
-                  'tokeninfo_endpoint',
-                  'token_endpoint',
-                  'client_id',
-                  'client_secret',
-                  'redirect_uri',
-                  'scope',
-                  'state',
-                  ]:
+        for k in props_params:
             v = getattr(self, k)
             if v != '':
                 data[k] = v
+
+        data_url = {}
+        for k in props_url_params:
+            v = getattr(self, k)
+            if v != '':
+                data_url[k] = v
+
+        data['url_params'] = data_url
+
         return data

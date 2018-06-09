@@ -28,11 +28,10 @@ class ParamsAuth0(HasTraits):
     scope_separator = Unicode(' ')
 
     def __init__(self,
-                 name='Auth0',
+                 name='auth0',
                  response_type=None,
                  domain=None,
                  client_id=None,
-                 client_secret=None,
                  redirect_uri=None,
                  audience=None,
                  scope=None,
@@ -52,19 +51,17 @@ class ParamsAuth0(HasTraits):
         self.name = name
 
         # overrides
-        if response_type:
+        if 'response_type' not in dic:
             self.response_type = response_type
-        if domain:
+        if 'domain' not in dic:
             self.domain = domain
-        if client_id:
+        if 'client_id' not in dic:
             self.client_id = client_id
-        if client_secret:
-            self.client_secret = client_secret
-        if redirect_uri:
+        if 'redirect_uri' not in dic:
             self.redirect_uri = redirect_uri
-        if audience:
+        if 'audience' not in dic:
             self.audience = audience
-        if scope:
+        if 'scope' not in dic:
             self.scope = scope
 
         self.authorize_endpoint = self.build_authorize_endpoint()
@@ -127,19 +124,31 @@ class ParamsAuth0(HasTraits):
     def build_data(self):
         """
         """
+        props_params = ['name',
+                        'authorize_endpoint'
+                        ]
+        props_url_params = ['response_type',
+                            'client_id',
+                            'client_secret',
+                            'redirect_uri',
+                            'audience',
+                            'scope',
+                            'nonce',
+                            'state',
+                            ]
+
         data = {}
-        for k in ['name',
-                  'response_type',
-                  'authorize_endpoint',
-                  'client_id',
-                  'client_secret',
-                  'redirect_uri',
-                  'audience',
-                  'scope',
-                  'nonce',
-                  'state',
-                  ]:
+        for k in props_params:
             v = getattr(self, k)
             if v != '':
                 data[k] = v
+
+        data_url = {}
+        for k in props_url_params:
+            v = getattr(self, k)
+            if v != '':
+                data_url[k] = v
+
+        data['url_params'] = data_url
+
         return data
