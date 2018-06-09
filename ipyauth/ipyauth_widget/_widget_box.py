@@ -10,7 +10,7 @@ import ipywidgets as wg
 from dotenv.main import dotenv_values
 
 from IPython.display import display
-from traitlets import observe, Unicode, Dict, Int, Bool
+from traitlets import HasTraits, observe, Unicode, Dict, Int, Bool
 
 from ..__meta__ import __version_js__
 from ._config import DIC_LOGO, DIC_SIGNOUT_TEXT
@@ -48,9 +48,11 @@ class Auth(wg.VBox):
                  params=None):
         """
         """
-        cname = str(params)
         msg = 'params must be a Params[IdProvider] object'
-        assert 'ipyauth.ipyauth_widget._params_' in cname and '.Params' in cname
+        test1 = issubclass(params.__class__, HasTraits)
+        cname = str(params.__class__)
+        test2 = 'ipyauth.ipyauth_widget._params_' in cname and '.Params' in cname
+        assert test1 and test2, msg
 
         # dic = {}
         uuid = ''.join([rd.choice(string.ascii_lowercase) for n in range(6)])

@@ -88,8 +88,13 @@ class ParamsAuth0(HasTraits):
     def _valid_response_type(self, proposal):
         """
         """
-        if not proposal['value'] in ['token', 'code']:
-            raise TraitError('response_type must be "token" or "code"')
+        elmts = proposal['value'].split(' ')
+        if not 'id_token' in elmts:
+            raise TraitError('response_type must be contain "id_token"')
+        code = 'code' in elmts
+        token = 'token' in elmts
+        if not (code or token) or (code and token):
+            raise TraitError('response_type must contain "token" xor "code"')
         return proposal['value']
 
     @validate('redirect_uri')
@@ -97,7 +102,16 @@ class ParamsAuth0(HasTraits):
         """
         """
         if not Util.is_url(proposal['value']):
-            raise TraitError('redirect_uri must be an https url')
+            raise TraitError('redirect_uri must be a url')
+        return proposal['value']
+
+    @validate('scope')
+    def _valid_scope(self, proposal):
+        """
+        """
+        elmts = proposal['value'].split(' ')
+        if not ('profile' in elmts) and not ('openid' in elmts) and not ('mail' in elmts):
+            raise TraitError('scope must contain "profile" and "openid" and "mail"')
         return proposal['value']
 
     def build_authorize_endpoint(self):
