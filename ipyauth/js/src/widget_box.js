@@ -6,12 +6,12 @@ import { version } from '../package.json';
 
 // import callback from './widget_callback';
 
-const semver_range = '~' + version;
+const semver_range = `~${version}`;
 
-let temp;
+// let temp;
 
 const AuthModel = widgets.VBoxModel.extend({
-    defaults: function() {
+    defaults() {
         return extend(AuthModel.__super__.defaults.call(this), {
             _model_name: 'AuthModel',
             _view_name: 'AuthView',
@@ -37,52 +37,33 @@ const AuthModel = widgets.VBoxModel.extend({
         });
     },
 
-    initialize: function() {
+    initialize() {
         console.log('ipyauth start initialize');
 
         // Use apply() on parent initialize
         AuthModel.__super__.initialize.apply(this, arguments);
-        // console.log('after super initialize');
-
-        // let _id_in_url = callback.handle();
-
-        // console.log('_id_in_url');
-        // console.log(_id_in_url);
-
-        // if (_id_in_url) {
-        //     temp = _id_in_url;
-        // }
 
         console.log('ipyauth end initialize');
     },
 });
 
 const AuthView = widgets.VBoxView.extend({
-    render: function() {
+    render() {
         console.log('ipyauth start render');
 
         // Use call() on parent render
         AuthView.__super__.render.call(this);
 
         // explicit
-        let that = this;
+        const that = this;
 
-        console.log('_id');
-        console.log(that.model.get('_id'));
-
-        // if (temp) {
-        //     let _id = temp;
-        //     that.model.set({ _id: _id });
-        // }
-        // console.log(that.model.get('_id'));
-
-        let resolved = {};
-        let promise1 = this.children_views.views;
+        const resolved = {};
+        const promise1 = this.children_views.views;
 
         Promise.all(promise1).then(views1 => {
             console.log('views1 callback start');
 
-            let promise2 = [
+            const promise2 = [
                 views1[0].children_views.views[1],
                 views1[0].children_views.views[2],
                 views1[0].children_views.views[3],
@@ -104,7 +85,7 @@ const AuthView = widgets.VBoxView.extend({
                 const btn_main_clicked = function() {
                     console.log('btn_main clicked');
                     if (auth.isLogged(that)) {
-                        auth.logout(that);
+                        auth.clear(that);
                     } else {
                         auth.login(that);
                     }
@@ -118,7 +99,16 @@ const AuthView = widgets.VBoxView.extend({
                 resolved.btn_inspect.el.addEventListener('click', btn_inspect_clicked);
 
                 that.form = resolved;
-                auth.updateDisplay(that);
+                // auth.updateDisplay(that);
+
+                // iframe
+                const ifrm = document.createElement('iframe');
+                ifrm.id = 'auth';
+                ifrm.width = '600';
+                ifrm.height = '300';
+                ifrm.src = '';
+                ifrm.style.display = 'none';
+                that.el.appendChild(ifrm);
 
                 // debug
                 console.log('resolved');
@@ -136,7 +126,7 @@ const AuthView = widgets.VBoxView.extend({
         console.log('ipyauth end render');
     },
 
-    click_signout_changed: function() {
+    click_signout_changed() {
         console.log('start click_signout_changed');
         auth.clearWidget(that);
     },

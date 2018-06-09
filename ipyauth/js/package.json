@@ -57,11 +57,7 @@
     "dependencies": {
         "@jupyter-widgets/base": "^1.1.8",
         "@jupyter-widgets/controls": "^1.1.6",
-        "auth0-js": "^9.3.2",
-        "auth0-lock": "^11.6.0",
-        "gapi-snapshot": "^0.1.0",
-        "googleapis": "^29.0.0",
-        "lodash": "^4.17.5",
-        "query-string": "^5.1.0"
+        "axios": "^0.18.0",
+        "lodash": "^4.17.5"
     }
 }

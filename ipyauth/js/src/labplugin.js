@@ -1,27 +1,25 @@
-
-
 import * as base from '@jupyter-widgets/base';
 
 import * as myWidget from './widget';
 import { version } from './index';
 
-let id = 'ipyauth';
-let requires = [base.IJupyterWidgetRegistry];
-let autoStart = true;
+const id = 'ipyauth';
+const requires = [base.IJupyterWidgetRegistry];
+const autoStart = true;
 
-let activate = (app, widgets) => {
-	console.log('JupyterLab extension ipyauth is activated!');
+const activate = (app, widgets) => {
+    console.log('JupyterLab extension ipyauth is activated!');
 
-	widgets.registerWidget({
-		name: 'ipyauth',
-		version: version,
-		exports: myWidget
-	});
+    widgets.registerWidget({
+        name: 'ipyauth',
+        version,
+        exports: myWidget,
+    });
 };
 
 export default {
-	id,
-	requires,
-	activate,
-	autoStart
+    id,
+    requires,
+    activate,
+    autoStart,
 };
