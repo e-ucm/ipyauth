@@ -5,7 +5,7 @@ from ._widget_box import Auth
 
 from ._params_auth0 import ParamsAuth0
 from ._params_google import ParamsGoogle
-from ._params_sgconnect import ParamsSGConnect
+from ._params_sgconnect import ParamsSgConnect
 
 
 def _jupyter_nbextension_paths():

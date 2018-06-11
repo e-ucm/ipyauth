@@ -28,7 +28,6 @@ class ParamsGoogle(HasTraits):
                  redirect_uri=None,
                  scope=None,
                  include_granted_scopes='false',
-                 access_type='online',
 
                  dotenv_folder='.',
                  dotenv_file=None,
@@ -55,8 +54,6 @@ class ParamsGoogle(HasTraits):
             self.scope = scope
         if include_granted_scopes:
             self.include_granted_scopes = include_granted_scopes
-        if access_type:
-            self.access_type = access_type
 
         self.data = self.build_data()
 
@@ -122,6 +119,7 @@ class ParamsGoogle(HasTraits):
                             'client_id',
                             'redirect_uri',
                             'scope',
+                            'include_granted_scopes',
                             ]
 
         data = {}

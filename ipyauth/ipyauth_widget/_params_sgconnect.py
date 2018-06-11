@@ -7,7 +7,7 @@ from traitlets import HasTraits, Unicode, validate, TraitError
 from ._util import Util
 
 
-class ParamsSGConnect(HasTraits):
+class ParamsSgConnect(HasTraits):
     """
     """
 
@@ -87,7 +87,7 @@ class ParamsSGConnect(HasTraits):
         """
         """
         elmts = proposal['value'].split(' ')
-        if not ('profile' in elmts) and not ('openid' in elmts) and not ('mail' in elmts):
+        if not ('profile' in elmts) and not ('openid' in elmts):
             raise TraitError('scope must contain "profile" and "openid" and "mail"')
         return proposal['value']
 
