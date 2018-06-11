@@ -1,19 +1,14 @@
 
-import os
-import json
 import string
-import site
 
 import random as rd
 import ipywidgets as wg
 
-from dotenv.main import dotenv_values
-
-from IPython.display import display
-from traitlets import HasTraits, observe, Unicode, Dict, Int, Bool
+from traitlets import HasTraits, Unicode, Dict, Int
 
 from ..__meta__ import __version_js__
 from ._config import DIC_LOGO
+
 
 
 _semver_range_frontend_ = '~' + __version_js__
@@ -36,12 +31,13 @@ class Auth(wg.VBox):
     params = Dict({}).tag(sync=True)
 
     access_token = Unicode('').tag(sync=True)
+    code = Unicode('').tag(sync=True)
     scope = Unicode('').tag(sync=True)
     logged_as = Unicode('').tag(sync=True)
     time_to_exp = Unicode('').tag(sync=True)
     expires_at = Unicode('').tag(sync=True)
 
-    _click_signout = Int(0).tag(sync=True)
+    _incr_signout = Int(0).tag(sync=True)
 
     def __init__(self,
                  params=None):
@@ -79,9 +75,6 @@ class Auth(wg.VBox):
         b2 = wg.HBox([wg_scope])
 
         super().__init__([b1, b2])
-
-        # if 'callback_info' in self.params:
-        #     self.create_callback_creds_file(self.params['callback_info'])
 
     def build_widget_logo(self):
         """
@@ -185,53 +178,11 @@ class Auth(wg.VBox):
                      'expires_at',
                      'scope',
                      'access_token',
+                     '_incr_signout',
                      ]:
             print('{} = {}'.format(attr, getattr(self, attr)))
 
     def clear(self):
         """
         """
-        self._click_signout += 1
-
-    # def create_callback_creds_file(self, dic_attr):
-    #     """
-    #     method called to create file creds-IdProvider.js
-    #     under ipyauth_callback/templates/dist/assets
-    #     to allow callbackk page access to credentials
-    #     listed in li_attr
-    #     """
-    #     id_provider = dic_attr['id_provider']
-    #     li_param = dic_attr['params']
-
-    #     path_site_packages = site.getsitepackages()[0]
-    #     path_package = os.path.join(path_site_packages, 'ipyauth')
-    #     path_package_link = os.path.join(path_site_packages, 'ipyauth.egg-link')
-
-    #     if os.path.exists(path_package):
-    #         # installed package
-    #         path_file_creds = os.path.join(path_package,
-    #                                        'ipyauth_callback',
-    #                                        'templates',
-    #                                        'dist',
-    #                                        'assets',
-    #                                        'creds-{}.js'.format(id_provider))
-    #     elif os.path.exists(path_package_link):
-    #         # dev install i.e. linked
-    #         with open(path_package_link, 'r') as f:
-    #             content = f.read()
-    #         path_package_read = content.split('\n')[0].strip()
-    #         path_file_creds = os.path.join(path_package_read,
-    #                                        'ipyauth',
-    #                                        'ipyauth_callback',
-    #                                        'templates',
-    #                                        'dist',
-    #                                        'assets',
-    #                                        'creds-{}.js'.format(id_provider))
-    #     else:
-    #         raise Exception('Cannot find package path')
-
-    #     with open(path_file_creds, 'w') as f:
-    #         lines = ["const {}_{}='{}';".format(id_provider, p, self.params[p])
-    #                  for p in li_param]
-    #         content = '\n'.join(lines)
-    #         f.write(content)
+        self._incr_signout += 1

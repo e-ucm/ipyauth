@@ -50,16 +50,19 @@ const auth0 = {
         const { url_params } = params;
         return new Promise((resolve, reject) => {
             // same nonce
+            util.debug('url_params.nonce', url_params.nonce);
+            util.debug('creds.id_token.nonce', creds.id_token.nonce);
             const b = url_params.nonce === creds.id_token.nonce;
             // scope is not returned if all requested granted
             if (!creds.scope) {
                 creds.scope = url_params.scope;
             }
+            // set username
+            creds.username = creds.id_token.nickname;
             // set expiry
             const now = new Date();
             creds.expiry = new Date(now.getTime() + creds.expires_in * 1000);
-            // set username
-            creds.username = creds.id_token.nickname;
+            // return creds
             resolve([b, creds]);
         });
     },
@@ -68,7 +71,7 @@ const auth0 = {
 // https://developers.google.com/identity/protocols/OAuth2WebServer#formingtheurl
 const google = {
     name: 'google',
-    authorize_endpoint: ' https://accounts.google.com/o/oauth2/v2/auth',
+    authorize_endpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
     url_params: {
         response_type: '',
         redirect_uri: 'my-redirect-uri',

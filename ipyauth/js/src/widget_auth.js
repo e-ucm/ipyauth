@@ -1,19 +1,28 @@
 import util from './widget_util';
 import provider from './widget_id_providers';
 
-const ipyauthHistory = [];
+const ipyauthStatus = {
+    history: [],
+    popupIsOpen: false,
+    authIsOk: false,
+};
+window.ipyauthStatus = ipyauthStatus;
 
-const startAuthFlowInIframe = (authUrl, readMessage) => {
+const startAuthFlowInIframe = (authUrl, readMessage, that) => {
+    setTimeout(() => {
+        console.log('in iframe must have refused to display');
+        util.debug('ipyauthStatus.popupIsOpen', ipyauthStatus.popupIsOpen);
+        util.debug('ipyauthStatus.authIsOk', ipyauthStatus.authIsOk);
+        if (!ipyauthStatus.authIsOk && !ipyauthStatus.popupIsOpen) {
+            startAuthFlow(that, 'popup', 'consent');
+        }
+    }, 1000);
     window.addEventListener('message', readMessage);
-    try {
-        document.getElementById('auth').src = authUrl;
-    } catch (e) {
-        window.removeEventListener('message', readMessage);
-        debug('Error in startAuthFlowInIframe', e);
-    }
+    const iframe = document.getElementById('auth');
+    iframe.src = authUrl;
 };
 
-const startAuthFlowInPopup = (authUrl, name, readMessage, windowProps = null) => {
+const startAuthFlowInPopup = (authUrl, readMessage, name, windowProps = null) => {
     window.addEventListener('message', readMessage);
 
     let props = windowProps;
@@ -35,27 +44,23 @@ const startAuthFlowInPopup = (authUrl, name, readMessage, windowProps = null) =>
 
 function startAuthFlow(that, mode, prompt) {
     console.log('start startAuthFlow');
+
+    // init
+    ipyauthStatus.authIsOk = false;
     const isIframeMode = mode === 'iframe';
     const paramsModel = that.model.get('params');
     const IdProviderName = paramsModel.name;
 
     console.log(`name=${IdProviderName}, isIframeMode=${isIframeMode}`);
-
     util.debug('paramsModel', paramsModel);
 
     // build params
-
     const paramsTemplate = provider[IdProviderName];
-
     const paramsFull = Object.assign({}, paramsTemplate, paramsModel);
-    util.debug('paramsFull0', paramsFull);
-
     const url_params = Object.assign({}, paramsTemplate.url_params, paramsModel.url_params);
     paramsFull.url_params = url_params;
-    util.debug('paramsFull1', paramsFull);
-
     paramsFull.url_params = util.buildUrlParams(paramsFull, isIframeMode, prompt);
-    util.debug('paramsFull2', paramsFull);
+    util.debug('paramsFull', paramsFull);
 
     // build authorize url
     const authUrl = util.buildAuthorizeUrl(paramsFull);
@@ -64,14 +69,16 @@ function startAuthFlow(that, mode, prompt) {
     // build readmessage function
     that.params = paramsFull;
     const readMessage = buidReadMessage(that);
-    // util.debug('readMessage', readMessage);
 
-    util.logAuthFlow(ipyauthHistory, IdProviderName, mode, prompt);
+    util.logAuthFlow(ipyauthStatus.history, IdProviderName, mode, prompt);
 
     if (isIframeMode) {
-        startAuthFlowInIframe(authUrl, readMessage);
+        util.debug('----------- startAuthFlowInIframe', startAuthFlowInIframe);
+        startAuthFlowInIframe(authUrl, readMessage, that);
     } else {
-        const popupWindowRef = startAuthFlowInPopup(authUrl, IdProviderName, readMessage);
+        util.debug('----------- startAuthFlowInPopup', startAuthFlowInPopup);
+        const popupWindowRef = startAuthFlowInPopup(authUrl, readMessage, IdProviderName);
+        ipyauthStatus.popupIsOpen = true;
         window.popupWindowRef = popupWindowRef;
     }
 }
@@ -92,21 +99,27 @@ const buidReadMessage = that => {
         const { data } = event;
         window.data = data;
 
+        util.debug('data', data);
+        util.debug('data.state', data.state);
+
         if (util.isPopup(data.state)) {
             popupWindowRef.close();
+            ipyauthStatus.popupIsOpen = false;
         }
 
         if (data.statusAuth === 'ok') {
             // no error in callback page
+            console.log('start callback ok');
             params.isValid(params, data).then(([isValid, creds]) => {
-                console.log('in callback');
                 util.debug('creds', creds);
                 if (isValid) {
                     that.creds = creds;
-                    const objCreds = util.buildObjCreds(params, creds);
+                    // const objCreds = util.buildObjCreds(params, creds);
+                    const objCreds = util.buildObjCreds(that);
+                    ipyauthStatus.authIsOk = true;
                     updateDisplay(that, objCreds);
                 } else {
-                    console.log('Error in authentication');
+                    console.log('Error: Callback page params are invalid');
                     alert('ipyauth Error: Invalid Callback - Open console for more info');
                 }
             });
@@ -114,9 +127,9 @@ const buidReadMessage = that => {
 
         if (data.statusAuth === 'error') {
             // error in callback page
-            console.log('in error');
+            console.log('start callback error');
             const IdProviderName = util.getIdProviderFromState(data.state);
-            const lastLog = util.getLastLog(ipyauthHistory, IdProviderName);
+            const lastLog = util.getLastLog(ipyauthStatus.history, IdProviderName);
             util.debug('lastLog', lastLog);
             if (lastLog) {
                 const lastLogWasIframe = lastLog.mode === 'iframe';
@@ -125,7 +138,7 @@ const buidReadMessage = that => {
                     console.log('Start new auth flow in popup');
                     startAuthFlow(that, 'popup', 'consent');
                 } else {
-                    console.log('Error in authentication');
+                    console.log('Error: Callback reports 2 errors in a row');
                     alert('ipyauth Error: Authentication Failed - Open console for more info');
                 }
             }
@@ -138,19 +151,20 @@ const buidReadMessage = that => {
 const login = that => startAuthFlow(that, 'iframe', 'none');
 
 const updateDisplay = (that, objCreds) => {
-    window.creds = objCreds;
     console.log('start updateDisplay');
+    window.creds = objCreds;
 
     that.model.set({
         logged_as: objCreds.username,
-        expires_at: objCreds.expiry.toString(),
+        expires_at: objCreds.getStrExpiry(),
         scope: objCreds.scope,
-        access_token: objCreds.access_token,
+        access_token: objCreds.getAccessToken(),
+        code: objCreds.getCode(),
     });
 
     that.form.btn_main.model.set_state({ description: 'Clear' });
     that.form.logged_as.model.set({ value: util.toHtml(objCreds.username, 'text') });
-    that.form.expires_at.model.set({ value: util.toHtml(objCreds.expiry.toString(), 'text') });
+    that.form.expires_at.model.set({ value: util.toHtml(objCreds.getStrExpiry(), 'text') });
     that.form.btn_inspect.model.set_state({ disabled: false });
     that.form.scope.model.set({
         value: util.toHtml(objCreds.scope, 'scope', objCreds.scope_separator),
@@ -166,26 +180,26 @@ const updateDisplay = (that, objCreds) => {
 const startCountdown = (that, objCreds) => {
     console.log('start startCountdown');
 
-    // const { expires_at } = objCreds;
-    // let nbSec = Math.floor((expires_at - new Date()) / 1000);
     let nbSec = objCreds.getSecondsToExp();
-    if (that.timer) {
-        clearInterval(that.timer);
+    if (nbSec > -1) {
+        if (that.timer) {
+            clearInterval(that.timer);
+        }
+        that.timer = setInterval(() => {
+            nbSec -= 1;
+            if (nbSec >= 0) {
+                const time_to_exp = util.toHMS(nbSec);
+                that.model.set({ time_to_exp });
+                that.form.time_to_exp.model.set({ value: util.toHtml(time_to_exp, 'time-to-exp') });
+                // save state
+                that.model.save_changes();
+            }
+            if (nbSec === 0) {
+                clear(that);
+                login(that);
+            }
+        }, 1000);
     }
-    that.timer = setInterval(() => {
-        nbSec -= 1;
-        if (nbSec >= 0) {
-            const time_to_exp = util.toHMS(nbSec);
-            that.model.set({ time_to_exp });
-            that.form.time_to_exp.model.set({ value: util.toHtml(time_to_exp, 'time-to-exp') });
-            // save state
-            that.model.save_changes();
-        }
-        if (nbSec === 0) {
-            clear(that);
-            login(that);
-        }
-    }, 1000);
 };
 
 const clear = that => {

@@ -2,6 +2,8 @@ import { extend } from 'lodash';
 import * as widgets from '@jupyter-widgets/controls';
 
 import auth from './widget_auth';
+import util from './widget_util';
+
 import { version } from '../package.json';
 
 const semver_range = `~${version}`;
@@ -27,7 +29,9 @@ const AuthModel = widgets.VBoxModel.extend({
             time_to_exp: '',
             expires_at: '',
 
-            _click_signout: 0,
+            _incr_signout: 0,
+            _incr_code: 0,
+            _incr_display: 0,
         });
     },
 
@@ -103,18 +107,28 @@ const AuthView = widgets.VBoxView.extend({
                 ifrm.style.display = 'none';
                 that.el.appendChild(ifrm);
 
+                // debug
+                window.that = that;
+
                 console.log('views2 callback end');
             });
             console.log('views1 callback end');
         });
 
-        that.model.on('change:_click_signout', that.click_signout_changed, that);
+        that.model.on('change:_incr_signout', that.incr_signout, that);
+        that.model.on('change:_incr_display', that.incr_display, that);
         console.log('ipyauth end render');
     },
 
-    click_signout_changed() {
-        console.log('start click_signout_changed');
+    incr_signout() {
+        console.log('start incr_signout');
         auth.clearWidget(that);
+    },
+
+    incr_display() {
+        console.log('start incr_display');
+        const objCreds = util.buildObjCreds(that);
+        auth.clearWidget(that, objCreds);
     },
 });
 

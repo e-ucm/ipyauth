@@ -1,0 +1,7 @@
+{
+    "NotebookApp": {
+        "nbserver_extensions": {
+            "ipyauth.ipyauth_code.server_extension": true
+        }
+    }
+}

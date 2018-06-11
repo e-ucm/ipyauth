@@ -62,9 +62,13 @@ __data_files__ = [
     ('etc/jupyter/nbconfig/notebook.d', [
         'ipyauth/ipyauth_widget/ipyauth.json'
     ]),
-    # server extension
+    # server extension callback
     ('etc/jupyter/jupyter_notebook_config.d', [
         'ipyauth/ipyauth_callback/ipyauth.json'
+    ]),
+    # server extension code
+    ('etc/jupyter/jupyter_notebook_config.d', [
+        'ipyauth/ipyauth_code/ipyauth.json'
     ]),
 
 ]

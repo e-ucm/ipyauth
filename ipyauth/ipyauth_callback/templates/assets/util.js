@@ -15,7 +15,9 @@ function display(obj, id = 'authStatus', reset = false) {
 ///////////////////////////////////////////////////////
 
 function getDataFromCallbackUrl() {
-    const url = window.location.href.split('#')[1];
+    const url1 = window.location.href.split('#')[1];
+    const url2 = window.location.href.split('?')[1];
+    const url = url1 ? url1 : url2;
     const urlParams = new URLSearchParams(url);
     const data = Object.assign(
         ...Array.from(urlParams.entries()).map(([k, v]) => ({ [k]: v }))

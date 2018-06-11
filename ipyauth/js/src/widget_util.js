@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 const debug = (name, variable) => {
     console.log(name);
     console.log(JSON.stringify(variable));
@@ -56,32 +58,51 @@ const serialize = obj => {
     return elmts.join('&');
 };
 
+const isToken = url_params => {
+    const elmts = url_params.response_type.split(' ');
+    return elmts.includes('token');
+};
+
+const isCode = url_params => {
+    const elmts = url_params.response_type.split(' ');
+    return elmts.includes('code');
+};
+
 const isPopup = state => {
     const data = state.split(',');
     return data.includes('popup');
 };
 
-const buildObjCreds = (params, creds) => {
+// const buildObjCreds = (params, creds) => {
+const buildObjCreds = that => {
+    const { params } = that;
+    const { creds } = that;
     const obj = Object.assign({}, creds);
 
     obj.name = params.name;
     obj.scope_separator = params.scope_separator;
 
-    obj.getSecondsToExp = function(HMS = false) {
-        try {
-            const exp = this.expiry;
-            const now = new Date();
-            const n_sec = parseInt((exp - now) / 1000, 10);
-            return HMS ? toHMS(n_sec) : n_sec;
-        } catch (e) {
-            return -1;
-        }
+    obj.getSecondsToExp = (HMS = false) => {
+        const exp = creds.expiry;
+        const now = new Date();
+        const n_sec = parseInt((exp - now) / 1000, 10);
+        return HMS ? toHMS(n_sec) : n_sec;
     };
 
-    obj.isExpired = function() {
+    obj.isExpired = () => {
         const secondsToExp = this.getSecondsToExp();
         return secondsToExp <= 0;
     };
+
+    obj.getStrExpiry = () => {
+        if (obj.expiry) return obj.expiry.toString();
+        return '';
+    };
+
+    obj.getAccessToken = () => (obj.access_token ? obj.access_token : '');
+
+    obj.getCode = () => (obj.code ? obj.code : '');
+
     return obj;
 };
 
@@ -95,15 +116,16 @@ const buildWindowProps = objProps => {
 const buildUrlParams = (paramsFull, isIframeMode, prompt, randomNonce = true) => {
     const url_params = Object.assign({}, paramsFull.url_params);
 
+    const nonce = createNonce();
     if (randomNonce && url_params.nonce) {
-        url_params.nonce = createNonce();
+        url_params.nonce = nonce;
     }
 
-    url_params.state = [paramsFull.name, isIframeMode ? 'iframe' : 'popup'].join(',');
+    url_params.state = [paramsFull.name, isIframeMode ? 'iframe' : 'popup', nonce].join(',');
 
-    if (prompt) {
-        url_params.prompt = prompt;
-    }
+    // if (prompt === 'none') {
+    //     url_params.prompt = prompt;
+    // }
     if (isIframeMode) {
         url_params.prompt = 'none';
     }
@@ -122,6 +144,11 @@ const buildAuthorizeUrl = paramsFull => {
 const getIdProviderFromState = state => {
     if (!state) return null;
     return state.split(',')[0];
+};
+
+const getNonceFromState = state => {
+    if (!state) return null;
+    return state.split(',')[2];
 };
 
 const logAuthFlow = (history, IdProviderName, mode, prompt) => {
@@ -208,11 +235,44 @@ const parseJwt = id_token => {
     return JSON.parse(window.atob(base64));
 };
 
+const sendMessageToParent = (window, objMsg) => {
+    // debug('window.parent', window.parent);
+    window.parent.postMessage(objMsg, '*');
+    if (window.parent.opener) {
+        // debug('window.parent.opener', window.parent.opener);
+        window.parent.opener.postMessage(objMsg, '*');
+    }
+};
+
+const getXsrfCookie2 = () => {
+    const elemts = document.cookie
+        .split('; ')
+        .map(e => e.split('='))
+        .filter(e => e[0] === '_xsrf');
+    return elemts[0][1];
+};
+
+const getXsrfCookie = () => {
+    return new Promise((resolve, reject) => {
+        const url = `${origin()}/tree`;
+        axios.get(url).then(response => {
+            resolve(response);
+        });
+    });
+};
+
+const origin = () => window.location.origin;
+
+window.axios = axios;
+window.getXsrfCookie = getXsrfCookie;
+
 export default {
     debug,
 
     isLogged,
     isPopup,
+    isToken,
+    isCode,
 
     buildWindowProps,
     buildAuthorizeUrl,
@@ -220,12 +280,16 @@ export default {
     buildObjCreds,
 
     getIdProviderFromState,
+    getNonceFromState,
     logAuthFlow,
     getLastLog,
+    sendMessageToParent,
 
     toHMS,
     toHtml,
 
     parseJwt,
     openInNewTab,
+    getXsrfCookie,
+    origin,
 };

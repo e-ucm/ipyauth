@@ -12,24 +12,24 @@ def load_jupyter_server_extension(nb_app):
         os.path.join(os.path.dirname(__file__), 'templates', 'assets'),
     ]
 
-    class OAuthServerExtensionHandler(IPythonHandler):
+    class CallbackHandler(IPythonHandler):
         """
         """
 
         def get(self, path):
             """
             """
-            nb_app.log.info("in OAuthServerExtensionHandler with path={}".format(path))
+            nb_app.log.info("in CallbackHandler with path={}".format(path))
             self.write(self.render_template('index.html'))
 
-    class OAuthAssetsServerExtensionHandler(IPythonHandler):
+    class CallbackAssetsHandler(IPythonHandler):
         """
         """
 
         def get(self, path):
             """
             """
-            nb_app.log.info("in OAuthAssetsServerExtensionHandler with path={}".format(path))
+            nb_app.log.info("in CallbackAssetsHandler with path={}".format(path))
             self.write(self.render_template(path))
 
     host_pattern = '.*$'
@@ -37,7 +37,11 @@ def load_jupyter_server_extension(nb_app):
 
     web_app.add_handlers(
         host_pattern,
-        [(url_path_join(base_url, '/callback/assets/(.*)'), OAuthAssetsServerExtensionHandler),
-         (url_path_join(base_url, '/callback(.*)'), OAuthServerExtensionHandler)])
+        [(url_path_join(base_url, '/callback/assets/(.*)'), CallbackAssetsHandler),
+         (url_path_join(base_url, '/assets/(.*)'), CallbackAssetsHandler),
+         (url_path_join(base_url, '/callback(.*)'), CallbackHandler),
+         (url_path_join(base_url, '/callback.html(.*)'), CallbackHandler),
+         ]
+    )
 
     nb_app.log.info("ipyauth callback server extension enabled")

@@ -3,8 +3,9 @@ from ..__meta__ import __version__, version_info
 
 from ._widget_box import Auth
 
-from ._params_Auth0 import ParamsAuth0
-from ._params_Google import ParamsGoogle
+from ._params_auth0 import ParamsAuth0
+from ._params_google import ParamsGoogle
+from ._params_sgconnect import ParamsSGConnect
 
 
 def _jupyter_nbextension_paths():

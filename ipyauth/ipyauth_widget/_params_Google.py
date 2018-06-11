@@ -14,17 +14,12 @@ class ParamsGoogle(HasTraits):
 
     name = Unicode()
     response_type = Unicode()
-    authorize_endpoint = Unicode('https://accounts.google.com/o/oauth2/v2/auth')
-    token_endpoint = Unicode('https://www.googleapis.com/oauth2/v4/token')
-    tokeninfo_endpoint = Unicode('https://www.googleapis.com/oauth2/v3/tokeninfo')
+    authorize_endpoint = Unicode()
     client_id = Unicode()
-    client_secret = Unicode()
     redirect_uri = Unicode()
     scope = Unicode()
-    state = Unicode()
-    include_granted_scopes = Unicode('false')
-    access_type = Unicode('online')
-    scope_separator = Unicode(' ')
+    include_granted_scopes = Unicode()
+    access_type = Unicode()
 
     def __init__(self,
                  name='google',
@@ -32,6 +27,8 @@ class ParamsGoogle(HasTraits):
                  client_id=None,
                  redirect_uri=None,
                  scope=None,
+                 include_granted_scopes='false',
+                 access_type='online',
 
                  dotenv_folder='.',
                  dotenv_file=None,
@@ -48,14 +45,18 @@ class ParamsGoogle(HasTraits):
         self.name = name
 
         # overrides
-        if 'response_type' not in dic:
+        if response_type:
             self.response_type = response_type
-        if 'client_id' not in dic:
+        if client_id:
             self.client_id = client_id
-        if 'redirect_uri' not in dic:
+        if redirect_uri:
             self.redirect_uri = redirect_uri
-        if 'scope' not in dic:
+        if scope:
             self.scope = scope
+        if include_granted_scopes:
+            self.include_granted_scopes = include_granted_scopes
+        if access_type:
+            self.access_type = access_type
 
         self.data = self.build_data()
 
@@ -75,8 +76,8 @@ class ParamsGoogle(HasTraits):
     def _valid_response_type(self, proposal):
         """
         """
-        if not proposal['value'] in ['token', 'code']:
-            raise TraitError('response_type must be "token" or "code"')
+        if not proposal['value'] == 'token':
+            raise TraitError('response_type must be "token"')
         return proposal['value']
 
     @validate('redirect_uri')
@@ -96,21 +97,31 @@ class ParamsGoogle(HasTraits):
             raise TraitError('scope must contain "profile" and "openid"')
         return proposal['value']
 
+    @validate('include_granted_scopes')
+    def _valid_include_granted_scopes(self, proposal):
+        """
+        """
+        if proposal['value'] not in ['true', 'false']:
+            raise TraitError('include_granted_scopes must be "true" or "false"')
+        return proposal['value']
+
+    @validate('access_type')
+    def _valid_access_type(self, proposal):
+        """
+        """
+        if proposal['value'] not in ['online', 'offline']:
+            raise TraitError('access_type must be "online" or "offline"')
+        return proposal['value']
 
     def build_data(self):
         """
         """
         props_params = ['name',
-                        'authorize_endpoint',
-                        'tokeninfo_endpoint',
-                        'token_endpoint',
                         ]
         props_url_params = ['response_type',
                             'client_id',
-                            'client_secret',
                             'redirect_uri',
                             'scope',
-                            'state',
                             ]
 
         data = {}
