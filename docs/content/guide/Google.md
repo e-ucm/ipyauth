@@ -16,14 +16,13 @@ To use [Google](https://auth0.com/) as an authorisation server you need
 
 The following params are expected to instantiate a `ParamsGoogle` object. Some or all of these params can be made available in a dotenv file. If params are input via the dotenv file and directly, then the latter prevails. 
 
-The params given below are transparently mapped to the Google gapi library. See the [docs](https://developers.google.com/api-client-library/javascript/reference/referencedocs).
+The params given below are mapped to the Google authorize endpoint. See the [docs](https://developers.google.com/identity/protocols/OAuth2UserAgent).
 
-
-### api_key
+### response_type
 
 + type: `string`
 
-The Google apiKey field that enables finer monitoring/control of a client.
+This must be `token` as only the implicit flow is supported.
 
 ### client_id
 
@@ -31,11 +30,12 @@ The Google apiKey field that enables finer monitoring/control of a client.
 
 The Google clientId field.
 
-### discovery_docs
+### redirect_uri
 
 + type: `string`
 
-The Google discoveryDocs field.
+A URI that is listed the Google Console Restrictions / Authorized Redirect URIs section.  
+**IMPORTANT**: it must be `host:port/callback/` where `host:port` are your notebook servers'.
 
 ### scope
 
@@ -44,24 +44,13 @@ The Google discoveryDocs field.
 
 A space separated list of requested scopes.
 
-### fetch_basic_profile
-
-+ type: `boolean`
-+ default: `True`
-
-Automatically add `profile` and `openid` to `scope`
-
-### hosted_domain
+### include_granted_scopes
 
 + type: `string`
++ value: `true` or `false`
++ default: `false`
 
-The Google hosted_domain field. Useful only with G Suite.
-
-### openid_realm
-
-+ type: `string`
-
-The Google openid_realm field. Useful only for OpenID 2.0 client migration.
+Keeps previously obtained scopes.
 
 ### dotenv_folder
 
@@ -76,12 +65,6 @@ The folder in which a `dotenv_file` may be located.
 
 The dotenv file name, if any, containing some of the authentication params above.
 
-### verbose
-
-+ type: `string`
-+ default: `False`
-
-Helps debugging.
 
 
 ## Config
@@ -110,7 +93,7 @@ There are tons of Google APIs. See the [Google API discover page](https://develo
 
 In this example we will the use the [Drive API](https://developers.google.com/drive/api/v3/reference/) And [Sheet API](https://developers.google.com/sheets/api/reference/rest/) to create a spreadsheet, put data in, update it, and finally share it with other people.  
 
-See the [demo notebook](https://nbviewer.jupyter.org/urls/gitlab.com/oscar6echo/ipyauth/raw/master/notebooks/demo_ipyauth_Google.ipynb) for the full example.  
+See the [demo notebook](https://nbviewer.jupyter.org/urls/gitlab.com/oscar6echo/ipyauth/raw/master/notebooks/demo-ipyauth-google.ipynb) for the full example.  
 
 First create a `ipyauth-Google.env` file containing at least the following info:
 
@@ -174,5 +157,5 @@ folder_id = data['files'][0]['id']
 folder_id
 ```
 
-For the full sequence, see the [demo notebook](https://nbviewer.jupyter.org/urls/gitlab.com/oscar6echo/ipyauth/raw/master/notebooks/demo_ipyauth_Google.ipynb).
+For the full sequence, see the [demo notebook](https://nbviewer.jupyter.org/urls/gitlab.com/oscar6echo/ipyauth/raw/master/notebooks/demo-ipyauth-google.ipynb).
 

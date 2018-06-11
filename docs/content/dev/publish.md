@@ -42,12 +42,8 @@ For more info see th [official doc](https://docs.npmjs.com/getting-started/publi
 # starting from repo top folder
 # make sure the version in js/package.json is correct
 
-# build server extension callback page
-$ cd ipyauth/ipyauth_callback/templates
-$ npm install
-
 # build notebook extension javascript
-$ cd ../../js
+$ cd ipyauth/js
 $ npm install
 
 # test run to see what you will publish

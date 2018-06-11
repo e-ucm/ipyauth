@@ -20,6 +20,12 @@ To test it you must:
 
 The following params are expected to instantiate a `ParamsAuth0` object. Some or all of these params can be made available in a dotenv file. If params are input via the dotenv file and directly, then the latter prevails. 
 
+### response_type
+
++ type: `string`
+
+This must be `token id_token` as only the implicit flow is supported and the id_token is required for user data.
+
 ### domain
 
 + type: `string`
@@ -65,12 +71,6 @@ The folder in which a `dotenv_file` may be located.
 
 The dotenv file name, if any, containing some of the authentication params above.
 
-### verbose
-
-+ type: `string`
-+ default: `False`
-
-Helps debugging.
 
 
 ## Config
@@ -106,9 +106,9 @@ I found it helpful.
 
 In this example we are going to tap the protected API configured in the previous section.
 
-See the [demo notebook](https://nbviewer.jupyter.org/urls/gitlab.com/oscar6echo/ipyauth/raw/master/notebooks/demo_ipyauth_Auth0.ipynb) for the full example.  
+See the [demo notebook](https://nbviewer.jupyter.org/urls/gitlab.com/oscar6echo/ipyauth/raw/master/notebooks/demo-ipyauth-auth0.ipynb) for the full example.  
 
-First create a `ipyauth-demo.env` file containing at least the following info:
+First create a `ipyauth-Autho0-demo.env` file containing at least the following info:
 
 ```bash
 # file ./ipyauth-Auth0-demo.env
@@ -138,10 +138,10 @@ a
 ```
 
 After the OAuth2 3-step authentication dance, which:
-+ directs you away from the notebook url
++ opens a popup window
 + have you input your credentials with the authorisation server
-+ redirects you back to the allowed callback url
-+ then instantly back to your notebook url
++ redirects you back to the allowed callback url within the popup window
++ then data from the callback is sent back to the parent window and the popup closes
 
 the [JSON Web Token (JWT)](https://auth0.com/docs/jwt) is in the `Auth` object, ready to be used to tap a protected API.
 
@@ -169,7 +169,7 @@ data = json.loads(r.content.decode('utf-8'))
 print(data)
 ```
 
-You can read/write the list of usual fruits, but you can only read the list of exotic fruits. Re-authenticate with different scopes for more/less rights. See the [demo notebook](https://nbviewer.jupyter.org/urls/gitlab.com/oscar6echo/ipyauth/raw/master/notebooks/demo_ipyauth_Auth0.ipynb).
+You can read/write the list of usual fruits, but you can only read the list of exotic fruits. Re-authenticate with different scopes for more/less rights. See the [demo notebook](https://nbviewer.jupyter.org/urls/gitlab.com/oscar6echo/ipyauth/raw/master/notebooks/demo-ipyauth-auth0.ipynb).
 
 
 ## Demo API

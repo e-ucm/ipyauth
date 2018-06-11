@@ -16,14 +16,19 @@ p = ParamsAuth0(...) # See Auth0 section for details
 from from ipyauth import ParamsGoogle
 p = ParamsGoogle(...) # See Google section for details
 
+# SG Connect example
+from from ipyauth import ParamsSgConnect
+p = ParamsSgConnect(...) # See SG Connect section for details
+
 # create auth widget and display it
 a = Auth(params=p)
 a 
 ```
 
 For the exact inputs to create the `Params[IdProvider]` object see the relevant sections
-+ [Auth0 - Params](./Auth0.html#params)
-+ [Google - Params](./Google.html#params)
++ [Auth0 - Params](./auth0.html#params)
++ [Google - Params](./google.html#params)
++ [SG Connect - Params](./sgconnect.html#params)
 
 
 Then you should see the widget with the relevant logo. Examples:
@@ -35,6 +40,12 @@ Then you should see the widget with the relevant logo. Examples:
 + Google:
 
 ![](../img/widget-Google.png)
+
++ SG Connect:
+
+![](../img/widget-Google.png)
+
+
 
 After authentication the fields contain the:
 + user id

@@ -2,6 +2,15 @@
 
 This folder contains the documentation, on line at: https://oscar6echo.gitlab.io/ipyauth/
 
+## Develop
+
+Run from terminal:
+
+```bash
+$ yarn docs:dev
+```
+
+
 ## Deploy
 
 You can manually deploy as follows:

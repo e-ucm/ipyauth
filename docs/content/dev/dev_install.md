@@ -109,17 +109,6 @@ $ npm install
 $ npm run watch
 ```
 
-Build the server extension page:
-
-```bash
-# build serverextension callback page
-$ cd ../ipyauth_callback/templates
-$ npm install
-
-# (optional) auto rebuild /templates upon change - run in new terminal
-$ npm run watch
-```
-
 ## Python
 
 

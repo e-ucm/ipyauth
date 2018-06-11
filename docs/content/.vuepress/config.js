@@ -44,8 +44,9 @@ module.exports = {
 						// '',
 						'/guide/install',
 						'/guide/general',
-						'/guide/Auth0',
-						'/guide/Google',
+						'/guide/auth0',
+						'/guide/google',
+						'/guide/sgconnect',
 					]
 				},
 				{

@@ -11,7 +11,7 @@ features:
 - title: Simple
   details: Get an access token in 3 lines - Clear display of the scopes granted and token expiry.
 - title: Extensible
-  details: Various ID providers are possible - Currently works with Auth0 and Google.
+  details: Various ID providers are possible - Currently Auth0, Google and SG Connect (Société Générale).
 footer: MIT Licensed | Copyright © 2018-present Olivier Borderies
 ---
 
