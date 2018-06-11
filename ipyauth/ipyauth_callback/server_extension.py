@@ -1,49 +1,47 @@
 
 import os
-from notebook.base.handlers import IPythonHandler, path_regex
+from notebook.base.handlers import IPythonHandler
 from notebook.utils import url_path_join
-
 
 
 def load_jupyter_server_extension(nb_app):
     web_app = nb_app.web_app
 
     web_app.settings['jinja2_env'].loader.searchpath += [
-        os.path.join(os.path.dirname(__file__), 'templates', 'dist'),
-        os.path.join(os.path.dirname(__file__), 'templates', 'dist', 'assets'),
+        os.path.join(os.path.dirname(__file__), 'templates'),
+        os.path.join(os.path.dirname(__file__), 'templates', 'assets'),
     ]
 
-
-    class OAuthCallbackServerExtensionHandler(IPythonHandler):
+    class CallbackHandler(IPythonHandler):
         """
         """
 
         def get(self, path):
             """
             """
-            # self.write(self.render_template('index.html', **self.application.settings))
+            nb_app.log.info("in CallbackHandler with path={}".format(path))
             self.write(self.render_template('index.html'))
-            nb_app.log.info("in OAuthCallbackServerExtensionHandler with path={}".format(path))
 
-    class OAuthCallbackAssetsServerExtensionHandler(IPythonHandler):
+    class CallbackAssetsHandler(IPythonHandler):
         """
         """
+
         def get(self, path):
             """
             """
-            if path =='ipyauth-Auth0-creds.js':
-                self.set_header('Cache-Control', 'no-cache')
-            nb_app.log.info("in OAuthCallbackAssetsServerExtensionHandler with path={}".format(path))
+            nb_app.log.info("in CallbackAssetsHandler with path={}".format(path))
             self.write(self.render_template(path))
 
-
     host_pattern = '.*$'
+    base_url = web_app.settings['base_url']
 
-    route_pattern = url_path_join(web_app.settings['base_url'], '/callback(.*)')
-    web_app.add_handlers(host_pattern, [(route_pattern, OAuthCallbackServerExtensionHandler)])
+    web_app.add_handlers(
+        host_pattern,
+        [(url_path_join(base_url, '/callback/assets/(.*)'), CallbackAssetsHandler),
+         (url_path_join(base_url, '/assets/(.*)'), CallbackAssetsHandler),
+         (url_path_join(base_url, '/callback(.*)'), CallbackHandler),
+         (url_path_join(base_url, '/callback.html(.*)'), CallbackHandler),
+         ]
+    )
 
-    route_pattern = url_path_join(web_app.settings['base_url'], '/assets-callback/(.*)')
-    web_app.add_handlers(host_pattern, [(route_pattern, OAuthCallbackAssetsServerExtensionHandler)])
-
-    nb_app.log.info("ipyauth-Auth0 callback server extension enabled")
-
+    nb_app.log.info("ipyauth callback server extension enabled")

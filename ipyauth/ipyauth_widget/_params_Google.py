@@ -1,108 +1,141 @@
 
-import os
 import json
 
 from copy import deepcopy as copy
+from traitlets import HasTraits, Unicode, validate, TraitError
 
-from ._load import load_dotenv
-from ._params import Params
+from ._util import Util
 
 
-class ParamsGoogle(Params):
+class ParamsGoogle(HasTraits):
     """
-    See Google doc
-    https://developers.google.com/api-client-library/javascript/reference/referencedocs
-    https://developers.google.com/identity/sign-in/web/reference
+    See Google doc https://developers.google.com/identity/protocols/OAuth2
     """
+
+    name = Unicode()
+    response_type = Unicode()
+    authorize_endpoint = Unicode()
+    client_id = Unicode()
+    redirect_uri = Unicode()
+    scope = Unicode()
+    include_granted_scopes = Unicode()
+    access_type = Unicode()
 
     def __init__(self,
-                 api_key=None,
+                 name='google',
+                 response_type=None,
                  client_id=None,
-                 discovery_docs=None,
-                 scope='',
-                 fetch_basic_profile=True,
-                 hosted_domain=None,
-                 openid_realm=None,
+                 redirect_uri=None,
+                 scope=None,
+                 include_granted_scopes='false',
+                 access_type='online',
 
                  dotenv_folder='.',
                  dotenv_file=None,
                  ):
         """
         """
+        dic = Util.load_dotenv(dotenv_folder,
+                               dotenv_file,
+                               name)
 
-        self._type = 'Google'
+        for k, v in dic.items():
+            setattr(self, k, v)
 
-        super().__init__(dotenv_folder=dotenv_folder,
-                         dotenv_file=dotenv_file,
-                         prefix=self._type)
+        self.name = name
 
         # overrides
-        if api_key:
-            self.api_key = api_key
+        if response_type:
+            self.response_type = response_type
         if client_id:
             self.client_id = client_id
-        if discovery_docs:
-            self.discovery_docs = discovery_docs
+        if redirect_uri:
+            self.redirect_uri = redirect_uri
         if scope:
             self.scope = scope
-        if fetch_basic_profile:
-            self.fetch_basic_profile = fetch_basic_profile
-        if hosted_domain:
-            self.hosted_domain = hosted_domain
-        if openid_realm:
-            self.openid_realm = openid_realm
+        if include_granted_scopes:
+            self.include_granted_scopes = include_granted_scopes
+        if access_type:
+            self.access_type = access_type
 
-        if hasattr(self, 'discovery_docs'):
-            self.discovery_docs = [e.strip()
-                                   for e in self.discovery_docs.split(' ') if e != '']
+        self.data = self.build_data()
 
-        self.check()
-
-    def check(self):
+    def to_dict(self):
         """
         """
-        if hasattr(self, 'api_key'):
-            url = 'https://developers.google.com/maps/documentation/javascript/get-api-key'
-            msg = 'api_key must be a string, a Google API key - See {}'.format(url)
-            is_api_key = isinstance(self.api_key, str)
-            assert is_api_key, msg
+        d = copy(self.__dict__)
+        d = {k: v for k, v in d.items() if v is not None}
+        return d
 
-        url = 'https://cloud.google.com/endpoints/docs/frameworks/java/creating-client-ids'
-        msg = 'client_id must be a string, a client aka application id - See {}'.format(url)
-        is_client_id = isinstance(self.client_id, str)
-        assert is_client_id, msg
+    def __repr__(self):
+        """
+        """
+        return json.dumps(self.data, sort_keys=False, indent=2)
 
-        if hasattr(self, 'discovery_docs'):
-            url = 'https://developers.google.com/discovery/'
-            msg = 'discovery_docs must be a string, a uri to to docs - See {}'.format(url)
-            is_discovery_docs = isinstance(self.discovery_docs, list)
-            assert is_discovery_docs, msg
-            for e in self.discovery_docs:
-                msg = 'element {} of discovery_docs must be a string - See {}'.format(e, url)
-                is_discovery_docs = isinstance(e, str)
-                assert is_discovery_docs, msg
+    @validate('response_type')
+    def _valid_response_type(self, proposal):
+        """
+        """
+        if not proposal['value'] == 'token':
+            raise TraitError('response_type must be "token"')
+        return proposal['value']
 
-        url = 'https://developers.google.com/apis-explorer'
-        msg = 'scope must be a string of space separated scopes - See {}'.format(url)
-        is_scope = isinstance(self.scope, str)
-        assert is_scope, msg
+    @validate('redirect_uri')
+    def _valid_redirect_uri(self, proposal):
+        """
+        """
+        if not Util.is_url(proposal['value']):
+            raise TraitError('redirect_uri must be an https url')
+        return proposal['value']
 
-        url = 'https://developers.google.com/identity/sign-in/web/reference'
-        msg = 'fetch_basic_profile must be a boolean, True to get openid profile email - See {}'.format(
-            url)
-        is_fetch_basic_profile = isinstance(self.fetch_basic_profile, bool)
-        assert is_fetch_basic_profile, msg
+    @validate('scope')
+    def _valid_scope(self, proposal):
+        """
+        """
+        elmts = proposal['value'].split(' ')
+        if not ('profile' in elmts) and not ('openid' in elmts):
+            raise TraitError('scope must contain "profile" and "openid"')
+        return proposal['value']
 
-        if hasattr(self, 'hosted_domain'):
-            url = 'https://developers.google.com/identity/sign-in/web/reference'
-            msg = 'hosted_domain must be a string - See {}'.format(url)
-            is_hosted_domain = isinstance(self.hosted_domain, str)
-            assert is_hosted_domain, msg
+    @validate('include_granted_scopes')
+    def _valid_include_granted_scopes(self, proposal):
+        """
+        """
+        if proposal['value'] not in ['true', 'false']:
+            raise TraitError('include_granted_scopes must be "true" or "false"')
+        return proposal['value']
 
-        if hasattr(self, 'openid_realm'):
-            url = 'https://developers.google.com/identity/sign-in/web/reference'
-            msg = 'openid_realm must be a string - See {}'.format(url)
-            is_openid_realm = isinstance(self.openid_realm, str)
-            assert is_openid_realm, msg
+    @validate('access_type')
+    def _valid_access_type(self, proposal):
+        """
+        """
+        if proposal['value'] not in ['online', 'offline']:
+            raise TraitError('access_type must be "online" or "offline"')
+        return proposal['value']
 
-        return True
+    def build_data(self):
+        """
+        """
+        props_params = ['name',
+                        ]
+        props_url_params = ['response_type',
+                            'client_id',
+                            'redirect_uri',
+                            'scope',
+                            ]
+
+        data = {}
+        for k in props_params:
+            v = getattr(self, k)
+            if v != '':
+                data[k] = v
+
+        data_url = {}
+        for k in props_url_params:
+            v = getattr(self, k)
+            if v != '':
+                data_url[k] = v
+
+        data['url_params'] = data_url
+
+        return data

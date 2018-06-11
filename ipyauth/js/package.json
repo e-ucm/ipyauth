@@ -27,7 +27,9 @@
         "prepare-dev": "webpack --mode development",
         "prepare": "webpack --mode production",
         "watch": "watch 'npm run prepare-dev' src/",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "eslint '**/*.js' --quiet",
+        "format": "prettier --write '**/*.js'"
     },
     "devDependencies": {
         "babel-core": "^6.26.3",
@@ -41,16 +43,21 @@
         "style-loader": "^0.20.2",
         "watch": "^1.0.2",
         "webpack": "^4.1.0",
-        "webpack-cli": "^2.0.10"
+        "webpack-cli": "^2.0.10",
+        "eslint": "^4.19.1",
+        "eslint-config-airbnb": "^16.1.0",
+        "eslint-config-prettier": "^2.9.0",
+        "eslint-plugin-html": "^4.0.3",
+        "eslint-plugin-import": "^2.12.0",
+        "eslint-plugin-jsx-a11y": "^6.0.3",
+        "eslint-plugin-prettier": "^2.6.0",
+        "eslint-plugin-react": "^7.8.2",
+        "prettier": "^1.13.4"
     },
     "dependencies": {
         "@jupyter-widgets/base": "^1.1.8",
         "@jupyter-widgets/controls": "^1.1.6",
-        "auth0-js": "^9.3.2",
-        "auth0-lock": "^11.6.0",
-        "gapi-snapshot": "^0.1.0",
-        "googleapis": "^29.0.0",
-        "lodash": "^4.17.5",
-        "query-string": "^5.1.0"
+        "axios": "^0.18.0",
+        "lodash": "^4.17.5"
     }
 }
