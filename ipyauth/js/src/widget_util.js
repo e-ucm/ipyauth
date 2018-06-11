@@ -186,11 +186,21 @@ const getLatestDate = arrDates => {
 
 const toHtml = (str, className, scope_separator = ' ') => {
     const css = {
-        'ipyauth-text': `
-			.ipyauth-text {
+        'ipyauth-name': `
+			.ipyauth-name {
 				background-color: white;
 				text-align: center;
 				line-height: 20px;
+			}`,
+        'ipyauth-expiry': `
+			.ipyauth-expiry {
+				background-color: white;
+				text-align: center;
+				line-height: 20px;
+				white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 290px;
 			}`,
         'ipyauth-time-to-exp': `
 			.ipyauth-time-to-exp {

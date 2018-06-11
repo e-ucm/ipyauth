@@ -163,8 +163,8 @@ const updateDisplay = (that, objCreds) => {
     });
 
     that.form.btn_main.model.set_state({ description: 'Clear' });
-    that.form.logged_as.model.set({ value: util.toHtml(objCreds.username, 'text') });
-    that.form.expires_at.model.set({ value: util.toHtml(objCreds.getStrExpiry(), 'text') });
+    that.form.logged_as.model.set({ value: util.toHtml(objCreds.username, 'name') });
+    that.form.expires_at.model.set({ value: util.toHtml(objCreds.getStrExpiry(), 'expiry') });
     that.form.btn_inspect.model.set_state({ disabled: false });
     that.form.scope.model.set({
         value: util.toHtml(objCreds.scope, 'scope', objCreds.scope_separator),

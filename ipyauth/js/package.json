@@ -1,6 +1,6 @@
 {
     "name": "ipyauth",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "A Custom Jupyter Widget Library",
     "author": "oscar6echo",
     "license": "MIT",
@@ -16,7 +16,9 @@
         "ipywidgets",
         "oauth2",
         "implicit flow",
-        "Auth0"
+        "Auth0",
+        "Google",
+        "SG Connect"
     ],
     "jupyterlab": {
         "extension": "src/labplugin"

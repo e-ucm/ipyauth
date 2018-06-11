@@ -137,7 +137,7 @@ class Auth(wg.VBox):
             layout=wg.Layout(
                 width='70px',
                 border='1px lightgray solid',
-                padding='5px 3px 3px 5px')
+                padding='3px')
         )
         return widget
 
@@ -149,7 +149,7 @@ class Auth(wg.VBox):
                 width='300px',
                 # max_height='28px',
                 border='1px lightgray solid',
-                padding='5px 3px 3px 5px')
+                padding='3px')
         )
         return widget
 
