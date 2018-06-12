@@ -93,7 +93,11 @@ Take the following steps to configure Auth0 for the example below:
 
 Below is a snapshot of the Auth0 admin screen, with the main menus circled in <span style="color: purple">purple</span>.
 
-![](../img/Auth0-applications.png)
+![](../img/auth0-applications.png)
+
+Below is a snapshot of the API screen.
+
+![](../img/auth0-apis.png)
 
 
 The purpose of the `API Fruit` is to give access to 2 sets of fruits, usual and exotic, in read only or read/write access. 
