@@ -2,7 +2,7 @@ module.exports = {
 	title: 'ipyauth',
 	description: 'OAuth2 authentication from inside Jupyter notebooks',
 	base: '/ipyauth/',
-	dest: '../public',
+	dest: '../mypublic',
 	head: [
 		['link', { rel: 'icon', href: `/key.png` }],
 	],
