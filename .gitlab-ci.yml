@@ -5,11 +5,10 @@ pages:
     paths:
     - docs/node_modules/
   script:
+  - mkdir public
   - cd docs
   - npm install
   - npm run docs:build
-  - mkdir public
-  - mv mypublic/* public
   artifacts:
     paths:
     - public
