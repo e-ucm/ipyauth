@@ -1,12 +1,11 @@
 
 # js
-recursive-include ipyauth/ipyauth/static *.*
+recursive-include ipyauth/ipyauth_widget/static *.*
 
 # subfolders
-recursive-include ipyauth/ipyauth/markdown *.md
-recursive-include ipyauth/ipyauth_callback/templates/dist index.html
-recursive-include ipyauth/ipyauth_callback/templates/dist/assets app.js
-recursive-include ipyauth/ipyauth_callback/templates/dist/assets vendor.js
+recursive-include ipyauth/ipyauth_widget/img *.png
+recursive-include ipyauth/ipyauth_callback/templates index.html
+recursive-include ipyauth/ipyauth_callback/templates/assets *.js
 
 # Misc
 include requirements.txt

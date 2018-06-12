@@ -39,10 +39,13 @@ __download_url__ = 'https://github.com/{}/{}/tarball/{}'.format(__author__,
                                                                 name_url,
                                                                 __version__)
 
-__keywords__ = ['jupyter-widget',
+__keywords__ = ['ipywidget',
                 'javascript',
                 'OAuth2',
                 'Implicit flow',
+                'Auth0',
+                'Google',
+                'SG Connect',
                 ]
 __license__ = 'MIT'
 __classifiers__ = ['Development Status :: 4 - Beta',
@@ -66,11 +69,6 @@ __data_files__ = [
     ('etc/jupyter/jupyter_notebook_config.d', [
         'ipyauth/ipyauth_callback/ipyauth.json'
     ]),
-    # server extension code
-    ('etc/jupyter/jupyter_notebook_config.d', [
-        'ipyauth/ipyauth_code/ipyauth.json'
-    ]),
-
 ]
 __zip_safe__ = False
 __entry_points__ = {}
