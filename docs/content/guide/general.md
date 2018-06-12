@@ -35,15 +35,15 @@ Then you should see the widget with the relevant logo. Examples:
 
 + Auth0:
 
-![](../img/widget-Auth0.png)
+![](../img/widget-auth0.png)
 
 + Google:
 
-![](../img/widget-Google.png)
+![](../img/widget-google.png)
 
 + SG Connect:
 
-![](../img/widget-Google.png)
+![](../img/widget-sgconnect.png)
 
 
 
