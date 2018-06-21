@@ -39,6 +39,12 @@ __download_url__ = 'https://github.com/{}/{}/tarball/{}'.format(__author__,
                                                                 name_url,
                                                                 __version__)
 
+__url__ = 'https://gitlab.com/{}/{}'.format(__author__, name_url)
+__download_url__ = 'https://gitlab.com/{}/{}/repository/archive.tar.gz?ref={}'.format(__author__,
+                                                                                      name_url,
+                                                                                      __version__)
+
+
 __keywords__ = ['ipywidget',
                 'javascript',
                 'OAuth2',
