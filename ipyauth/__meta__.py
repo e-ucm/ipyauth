@@ -32,13 +32,7 @@ __long_description__ = 'See repo README'
 __author__ = 'oscar6echo'
 __author_email__ = 'olivier.borderies@gmail.com'
 
-# github template
-__url__ = 'https://github.com/{}/{}'.format(__author__,
-                                            name_url)
-__download_url__ = 'https://github.com/{}/{}/tarball/{}'.format(__author__,
-                                                                name_url,
-                                                                __version__)
-
+# gitlab template
 __url__ = 'https://gitlab.com/{}/{}'.format(__author__, name_url)
 __download_url__ = 'https://gitlab.com/{}/{}/repository/archive.tar.gz?ref={}'.format(__author__,
                                                                                       name_url,
