@@ -8,15 +8,19 @@ const ipyauthStatus = {
 };
 window.ipyauthStatus = ipyauthStatus;
 
-const startAuthFlowInIframe = (authUrl, readMessage, that) => {
-    setTimeout(() => {
-        console.log('in iframe must have refused to display');
-        util.debug('ipyauthStatus.popupIsOpen', ipyauthStatus.popupIsOpen);
-        util.debug('ipyauthStatus.authIsOk', ipyauthStatus.authIsOk);
-        if (!ipyauthStatus.authIsOk && !ipyauthStatus.popupIsOpen) {
-            startAuthFlow(that, 'popup', 'consent');
-        }
-    }, 1000);
+// let timer;
+
+// const startAuthFlowInIframe = (authUrl, readMessage, that) => {
+// timer = setTimeout(() => {
+//     console.log('in iframe must have refused to display');
+//     util.debug('ipyauthStatus.popupIsOpen', ipyauthStatus.popupIsOpen);
+//     util.debug('ipyauthStatus.authIsOk', ipyauthStatus.authIsOk);
+//     if (!ipyauthStatus.authIsOk && !ipyauthStatus.popupIsOpen) {
+//         startAuthFlow(that, 'popup', 'consent');
+//     }
+// }, 1000);
+
+const startAuthFlowInIframe = (authUrl, readMessage) => {
     window.addEventListener('message', readMessage);
     const iframe = document.getElementById('auth');
     iframe.src = authUrl;
@@ -74,7 +78,7 @@ function startAuthFlow(that, mode, prompt) {
 
     if (isIframeMode) {
         util.debug('----------- startAuthFlowInIframe', startAuthFlowInIframe);
-        startAuthFlowInIframe(authUrl, readMessage, that);
+        startAuthFlowInIframe(authUrl, readMessage);
     } else {
         util.debug('----------- startAuthFlowInPopup', startAuthFlowInPopup);
         const popupWindowRef = startAuthFlowInPopup(authUrl, readMessage, IdProviderName);
@@ -92,7 +96,6 @@ const buidReadMessage = that => {
     const readMessage = event => {
         console.log('msg received');
 
-        window.removeEventListener('message', readMessage);
         util.debug('event.data', event.data);
 
         // extract data from message
@@ -101,6 +104,15 @@ const buidReadMessage = that => {
 
         util.debug('data', data);
         util.debug('data.state', data.state);
+
+        if (data.statusAuth === undefined) {
+            // sso window may send parasite messages
+            console.log('invalid data - discarding');
+            return;
+        }
+
+        // deactivate msg reception
+        window.removeEventListener('message', readMessage);
 
         if (util.isPopup(data.state)) {
             popupWindowRef.close();
@@ -128,12 +140,12 @@ const buidReadMessage = that => {
         if (data.statusAuth === 'error') {
             // error in callback page
             console.log('start callback error');
+            // clearInterval(timer);
             const IdProviderName = util.getIdProviderFromState(data.state);
             const lastLog = util.getLastLog(ipyauthStatus.history, IdProviderName);
             util.debug('lastLog', lastLog);
             if (lastLog) {
                 const lastLogWasIframe = lastLog.mode === 'iframe';
-                // util.debug('lastLogWasIframe', lastLogWasIframe);
                 if (lastLogWasIframe) {
                     console.log('Start new auth flow in popup');
                     startAuthFlow(that, 'popup', 'consent');
