@@ -8,18 +8,6 @@ const ipyauthStatus = {
 };
 window.ipyauthStatus = ipyauthStatus;
 
-// let timer;
-
-// const startAuthFlowInIframe = (authUrl, readMessage, that) => {
-// timer = setTimeout(() => {
-//     console.log('in iframe must have refused to display');
-//     util.debug('ipyauthStatus.popupIsOpen', ipyauthStatus.popupIsOpen);
-//     util.debug('ipyauthStatus.authIsOk', ipyauthStatus.authIsOk);
-//     if (!ipyauthStatus.authIsOk && !ipyauthStatus.popupIsOpen) {
-//         startAuthFlow(that, 'popup', 'consent');
-//     }
-// }, 1000);
-
 const startAuthFlowInIframe = (authUrl, readMessage) => {
     window.addEventListener('message', readMessage);
     const iframe = document.getElementById('auth');
@@ -140,7 +128,6 @@ const buidReadMessage = that => {
         if (data.statusAuth === 'error') {
             // error in callback page
             console.log('start callback error');
-            // clearInterval(timer);
             const IdProviderName = util.getIdProviderFromState(data.state);
             const lastLog = util.getLastLog(ipyauthStatus.history, IdProviderName);
             util.debug('lastLog', lastLog);
