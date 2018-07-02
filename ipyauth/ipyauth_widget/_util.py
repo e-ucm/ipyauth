@@ -28,7 +28,7 @@ class Util:
         """
         """
         if dotenv_file is None:
-            return
+            return {}
 
         msg = 'prefix must be a string in {}'.format(VALID_ID_PROVIDERS)
         assert prefix in VALID_ID_PROVIDERS, msg
