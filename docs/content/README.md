@@ -18,7 +18,7 @@ footer: MIT Licensed | Copyright © 2018-present Olivier Borderies
 ### Install
 
 ```bash
-# for notebook >= 5.4
+# for notebook >= 5.3
 $ pip install ipyauth
 
 # additionally for jupyterlab
