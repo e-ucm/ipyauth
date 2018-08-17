@@ -7,7 +7,7 @@ sidebarDepth: 1
 
 ## Overview
 
-To use [Google](https://auth0.com/) as an authorisation server you need
+To use [Google](https://developers.google.com/identity/) as an authorisation server you need
 + a Google account
 + to create a client id in the Google Console - see [Config](#config) section
 

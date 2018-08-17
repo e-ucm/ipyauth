@@ -7,7 +7,7 @@ sidebarDepth: 1
 
 ## Overview
 
-To use [SG Connect](https://auth0.com/) as an authorisation server you need
+To use **SG Connect** as an authorisation server you need
 + an SG Markets account
 + a client id - contact your SGCIB contact
 
