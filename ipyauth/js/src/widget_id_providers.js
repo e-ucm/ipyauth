@@ -2,8 +2,8 @@ import axios from 'axios';
 
 import util from './widget_util';
 
-const sgconnect = {
-    name: 'sgconnect',
+const sgconnectPRD = {
+    name: 'sgconnectPRD',
     authorize_endpoint: 'https://sso.sgmarkets.com/sgconnect/oauth2/authorize',
     url_params: {
         response_type: '',
@@ -31,6 +31,10 @@ const sgconnect = {
         });
     },
 };
+
+const sgconnectHOM = Object.assign({}, sgconnectPRD);
+sgconnectHOM.name = 'sgconnectHOM';
+sgconnectHOM.authorize_endpoint = 'https://sgconnect-hom.fr.world.socgen/sgconnect/';
 
 const auth0 = {
     name: 'auth0',
@@ -152,7 +156,8 @@ const google = {
 };
 
 export default {
-    sgconnect,
+    sgconnectPRD,
+    sgconnectHOM,
     auth0,
     google,
 };

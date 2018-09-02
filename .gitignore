@@ -26,3 +26,4 @@ TODO.md
 **/temp-*
 **-orig.*
 notebooks/*test.ipynb
+notebooks/secrets.txt

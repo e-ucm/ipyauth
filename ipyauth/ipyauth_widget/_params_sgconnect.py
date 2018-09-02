@@ -20,7 +20,7 @@ class ParamsSgConnect(HasTraits):
     scope = Unicode()
 
     def __init__(self,
-                 name='sgconnect',
+                 mode='PRD', # PRD or HOM
                  response_type=None,
                  client_id=None,
                  redirect_uri=None,
@@ -31,6 +31,8 @@ class ParamsSgConnect(HasTraits):
                  ):
         """
         """
+        name = 'sgconnect' + mode
+
         dic = Util.load_dotenv(dotenv_folder,
                                dotenv_file,
                                name)
@@ -62,6 +64,14 @@ class ParamsSgConnect(HasTraits):
         """
         """
         return json.dumps(self.data, sort_keys=False, indent=2)
+
+    @validate('name')
+    def _valid_response_type(self, proposal):
+        """
+        """
+        if not (proposal == 'sgconnectPRD' or proposal == 'sgconnectHOM'):
+            raise TraitError('mode must be "PRD" (default) or "HOM" (aka UAT)')
+        return proposal['value']
 
     @validate('response_type')
     def _valid_response_type(self, proposal):

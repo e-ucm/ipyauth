@@ -18,6 +18,13 @@ The following params are expected to instantiate a `ParamsSgConnect` object. Som
 
 The params given below are mapped to the SG Connect authorize endpoint.
 
+### mode
+
++ type: `string`
++ default `PRD`
+
+This must be `PRD` (production) or `HOM` (homologation aka UAT).
+
 ### response_type
 
 + type: `string`
@@ -67,10 +74,11 @@ In order to get a `client_id`, associated `redirect_uri`, and a list of scopes t
 
 See the [demo notebook](https://nbviewer.jupyter.org/urls/gitlab.com/oscar6echo/ipyauth/raw/master/notebooks/demo-ipyauth-sgconnect.ipynb).  
 
-First create a `ipyauth-sgconnect.env` file containing at least the following info:
+First create a `ipyauth-sgconnectPRD.env` or `ipyauth-sgconnectHOM.env` file (depending on the mode) containing at least the following info:
 
 ```bash
-# file ./ipyauth-sgconnect-demo.env
+# example
+# file ./ipyauth-sgconnectPRD-demo.env
 client_id=[your-client-id]
 scope=scopA scopeB
 ```
@@ -81,7 +89,9 @@ If these are not present in this file, they can be passed as direct params to th
 from ipyauth import ParamsSgConnect, Auth
 
 scope = 'scopeA scopeB'
-p = ParamsSgConnect(dotenv_file='ipyauth-sgconnect-demo.env', scope=scope)
+p = ParamsSgConnect(mode='PRD',
+                    dotenv_file='ipyauth-sgconnect-demo.env',
+                    scope=scope)
 a = Auth(params=p)
 a
 ```
