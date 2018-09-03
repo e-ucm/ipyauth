@@ -9,15 +9,15 @@ Examples:
 
 ```python
 # Auth0 example
-from from ipyauth import ParamsAuth0
+from ipyauth import ParamsAuth0
 p = ParamsAuth0(...) # See Auth0 section for details
 
 # Google example
-from from ipyauth import ParamsGoogle
+from ipyauth import ParamsGoogle
 p = ParamsGoogle(...) # See Google section for details
 
 # SG Connect example
-from from ipyauth import ParamsSgConnect
+from ipyauth import ParamsSgConnect
 p = ParamsSgConnect(...) # See SG Connect section for details
 
 # create auth widget and display it
