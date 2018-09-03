@@ -12,7 +12,7 @@ const sgconnectPRD = {
         scope: 'my-scopes',
         nonce: 'my-nonce',
         state: 'my-state',
-        acr_values: 'L1',
+        acr_values: 'L2',
     },
     scope_separator: ' ',
     isJWT: false,
@@ -34,7 +34,8 @@ const sgconnectPRD = {
 
 const sgconnectHOM = Object.assign({}, sgconnectPRD);
 sgconnectHOM.name = 'sgconnectHOM';
-sgconnectHOM.authorize_endpoint = 'https://sgconnect-hom.fr.world.socgen/sgconnect/';
+sgconnectHOM.authorize_endpoint = 'https://sgconnect-hom.fr.world.socgen/sgconnect/oauth2/authorize';
+sgconnectHOM.acr_values = 'L1';
 
 const auth0 = {
     name: 'auth0',

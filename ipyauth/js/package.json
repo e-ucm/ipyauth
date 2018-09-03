@@ -1,6 +1,6 @@
 {
     "name": "ipyauth",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "description": "A Custom Jupyter Widget Library",
     "author": "oscar6echo",
     "license": "MIT",
