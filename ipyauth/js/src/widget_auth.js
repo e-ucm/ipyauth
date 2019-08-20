@@ -156,7 +156,7 @@ const updateDisplay = (that, objCreds) => {
     that.model.set({
         logged_as: objCreds.username,
         expires_at: objCreds.getStrExpiry(),
-        scope: objCreds.scope,
+        scope: objCreds.scope || '',
         access_token: objCreds.getAccessToken(),
         code: objCreds.getCode(),
     });

@@ -217,9 +217,9 @@ const toHtml = (str, className, scope_separator = ' ') => {
 				margin: 3px 0 3px 0;
 			}`,
     };
-    let new_str = str;
+    let new_str = str || '';
     if (className === 'scope') {
-        const scopes = str.split(scope_separator).filter(e => e.length > 0);
+        const scopes = new_str.split(scope_separator).filter(e => e.length > 0);
         new_str = `<p style='color: gray;'>
             # ${scopes.length} Scopes Granted (scroll down)
             </p>`;
@@ -262,14 +262,13 @@ const getXsrfCookie2 = () => {
     return elemts[0][1];
 };
 
-const getXsrfCookie = () => {
-    return new Promise((resolve, reject) => {
+const getXsrfCookie = () =>
+    new Promise((resolve, reject) => {
         const url = `${origin()}/tree`;
         axios.get(url).then(response => {
             resolve(response);
         });
     });
-};
 
 const origin = () => window.location.origin;
 

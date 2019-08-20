@@ -19,12 +19,15 @@ def load_jupyter_server_extension(nb_app):
         def get(self, path):
             """
             """
-            nb_app.log.info("in CallbackHandler with path={}".format(path))
+            nb_app.log.info('in CallbackHandler with path={}'.format(path))
             self.write(self.render_template('index.html'))
 
     class CallbackAssetsHandler(IPythonHandler):
         """
         """
+
+        def prepare(self):
+            self.set_header('Content-Type', 'text/javascript')
 
         def get(self, path):
             """
