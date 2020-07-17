@@ -118,7 +118,7 @@ First create a `ipyauth-Autho0-demo.env` file containing at least the following 
 # file ./ipyauth-Auth0-demo.env
 domain=[your-domain].auth0.com
 client_id=[your-client-id]
-redirect_url=http://localhost:[your-port]/callback/
+redirect_uri=http://localhost:[your-port]/callback/
 ```
 
 Optionally add the following variables:
