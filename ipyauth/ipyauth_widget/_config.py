@@ -10,6 +10,7 @@ def _build_dics():
         'google': {'logo': 'google-logo.png'},
         'sgconnectPRD': {'logo': 'sg-logo.png'},
         'sgconnectHOM': {'logo': 'sg-logo.png'},
+        'keycloak': {'logo': 'keycloak-logo.png'},
     }
     dic_logo = {k: os.path.join(os.path.dirname(__file__), 'img', v['logo'])
                 for k, v in dic_filename.items()}
