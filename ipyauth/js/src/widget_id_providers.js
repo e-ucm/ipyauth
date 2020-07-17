@@ -2,6 +2,41 @@ import axios from 'axios';
 
 import util from './widget_util';
 
+const keycloak = {
+    name: 'keycloak',
+    authorize_endpoint: 'http://keycloak.example.com:8080/auth/realms/demo/protocol/openid-connect/auth',
+    url_params: {
+        response_type: '',
+        redirect_uri: 'my-redirect-uri',
+        client_id: 'my-client-id',
+        scope: 'my-scopes',
+        nonce: 'mynonce',
+        state: 'mystate',
+    },
+    scope_separator: ' ',
+    isJWT: true,
+    isValid: (params, creds) => {
+        const { url_params } = params;
+        return new Promise((resolve, reject) => {
+            // same nonce
+            util.debug('url_params.nonce', url_params.nonce);
+            util.debug('creds.id_token.nonce', creds.id_token.nonce);
+            const b = url_params.nonce === creds.id_token.nonce;
+            // set username
+            creds.username = creds.id_token.email;
+            // scope is not returned if all requested granted
+            if (!creds.scope) {
+                creds.scope = url_params.scope;
+            }
+            // set expiry
+            const now = new Date();
+            creds.expiry = new Date(now.getTime() + creds.expires_in * 1000);
+            // return creds
+            resolve([b, creds]);
+        });
+    },
+};
+
 const sgconnectPRD = {
     name: 'sgconnectPRD',
     authorize_endpoint: 'https://sso.sgmarkets.com/sgconnect/oauth2/authorize',
@@ -157,6 +192,7 @@ const google = {
 };
 
 export default {
+    keycloak,
     sgconnectPRD,
     sgconnectHOM,
     auth0,
