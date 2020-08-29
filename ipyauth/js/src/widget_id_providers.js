@@ -34,7 +34,7 @@ const sgconnectPRD = {
 
 const sgconnectHOM = Object.assign({}, sgconnectPRD);
 sgconnectHOM.name = 'sgconnectHOM';
-sgconnectHOM.authorize_endpoint = 'https://sgconnect-hom.fr.world.socgen/sgconnect/oauth2/authorize';
+sgconnectHOM.authorize_endpoint = 'https://XXX/sgconnect/oauth2/authorize';
 sgconnectHOM.acr_values = 'L1';
 
 const auth0 = {
