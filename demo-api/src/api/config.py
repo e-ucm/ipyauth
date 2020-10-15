@@ -1,8 +1,10 @@
 
+import os
+
 TENANT_URL = 'https://ipyauth-demo.eu.auth0.com'
 REDIRECT_URL = 'http://localhost:5000/api/fruit'
 USER_INFO_URL = TENANT_URL + '/userinfo'
-JWTKS_URL = TENANT_URL + '/.well-known/jwks.json'
+JWTKS_URL = os.getenv('JWTKS_URL',TENANT_URL + '/.well-known/jwks.json')
 
 AUDIENCE = 'api/fruit'
 
