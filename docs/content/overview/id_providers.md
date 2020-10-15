@@ -24,3 +24,8 @@ SG Connect is [Société Générale CIB](https://cib.societegenerale.com/en/) ID
 
 See the User Guide [SG Connect](../guide/sgconnect.html) section.
 
+## Keycloak
+
+[Keycloak](https://www.keycloak.org/) is Open Source Identity and Access Management solution.
+
+See the User Guide [KeyCloak](../guide/keycloak.html) section.
