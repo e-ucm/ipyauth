@@ -21,7 +21,7 @@ class JWTKS:
         except:
             raise Exception('Cannot download JWT key set from {}'.format(JWTKS_URL))
         if verbose:
-            print('>> JWTKS loaded')
+            print('>> JWTKS loaded from {}'.format(JWTKS_URL))
 
     def decode_token_rs256(self,
                            token,
