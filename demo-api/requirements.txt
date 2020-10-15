@@ -3,4 +3,4 @@ flask_restful
 gunicorn
 requests
 python-dotenv
-python-jose[pycryptodome]==3
+authlib

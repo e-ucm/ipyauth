@@ -2,7 +2,9 @@
 import json
 import requests as rq
 
-from jose import jwt
+from authlib.jose import JsonWebToken
+from authlib.jose import JsonWebSignature
+from authlib.jose import JsonWebKey
 
 from .config import JWTKS_URL
 
@@ -17,7 +19,7 @@ class JWTKS:
         """
         r = rq.get(JWTKS_URL)
         try:
-            self.data = json.loads(r.content.decode('utf-8'))
+            self.keySet = JsonWebKey.import_key_set(r.content.decode('utf-8'))
         except:
             raise Exception('Cannot download JWT key set from {}'.format(JWTKS_URL))
         if verbose:
@@ -30,28 +32,18 @@ class JWTKS:
         """
         See https://auth0.com/docs/jwks
         """
-        header = jwt.get_unverified_header(token)
-        kid = header['kid']
 
-        match = False
-        for e in self.data['keys']:
-            if e['kid'] == kid:
-                match = True
-                key = e
-                break
-
-        if not match:
-            raise Exception('Unknown sign key - Cannot decode token')
-
-        cert = \
-            '-----BEGIN CERTIFICATE-----\n' + \
-            key['x5c'][0] + \
-            '\n-----END CERTIFICATE-----'
-
-        token_info = jwt.decode(token,
-                                key=cert,
-                                algorithms=['RS256'],
-                                audience=audience)
+        jwt = JsonWebToken(['RS256'])
+        claims_options = {
+            "aud" : {
+                "essential": True,
+                "values": [audience]
+            }
+        }
+        token_info = jwt.decode(token, self.keySet, claims_options=claims_options)
+        print('>> token_info:')
+        print(token_info)
+        token_info.validate()
 
         if verbose:
             print('>> token_info:')
